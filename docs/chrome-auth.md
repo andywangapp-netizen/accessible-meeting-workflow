@@ -15,9 +15,9 @@ Use this when you evaluate the **deep-reasoning node** against production-shaped
 2. Keep that window in the normal (non-incognito) profile.
 3. In Codex or Coworker, ask the agent to **reuse the existing Zoom tab**, not to create a private window.
 4. Open the Zoom Workflow plugin surface you are testing.
-5. Paste the synthetic transcript from `cases/.../transcript.md` and attach `packs/autism/SKILL.md` (or the pack under test).
+5. Paste the synthetic transcript from `cases/.../transcript.md` and attach the root `SKILL.md`.
 6. Run deep reasoning. Save the visible HTML report to `runs/<date>/output.html`.
-7. Back in this repo: `ameval evaluate --skill packs/autism --case ... --output runs/<date>/output.html`.
+7. Back in this repo: `ameval evaluate --skill . --case ... --output runs/<date>/output.html`.
 
 ## Optional tab check (macOS, local only)
 

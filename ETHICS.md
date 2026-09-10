@@ -10,7 +10,7 @@ This project evaluates **communication support** after a meeting. It does not de
 
 ## Language
 
-Skill packs and evals must fail closed on diagnostic or shaming language. See `packs/autism/forbidden.md`.
+The skill and evaluator must fail closed on diagnostic or shaming language. See `forbidden.md`.
 
 ## Audience
 

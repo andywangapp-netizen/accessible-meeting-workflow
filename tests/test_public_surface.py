@@ -24,8 +24,8 @@ def _public_files() -> list[Path]:
 
 
 def test_only_autism_skill_is_public() -> None:
-    skill_dirs = {path.parent.name for path in ROOT.glob("packs/*/SKILL.md")}
-    assert skill_dirs == {"autism"}
+    skill_paths = [path.relative_to(ROOT).as_posix() for path in ROOT.rglob("SKILL.md")]
+    assert skill_paths == ["SKILL.md"]
 
 
 def test_public_files_have_no_credential_material() -> None:
@@ -33,7 +33,7 @@ def test_public_files_have_no_credential_material() -> None:
         re.compile(r"-----BEGIN [A-Z ]+PRIVATE KEY-----"),
         re.compile(r"\bAKIA[0-9A-Z]{16}\b"),
         re.compile(r"\beyJ[a-zA-Z0-9_-]{20,}\.[a-zA-Z0-9_-]{10,}\.[a-zA-Z0-9_-]{10,}\b"),
-        re.compile(r"https?://[^\s)]+(?:zoomdev|git\.zoom\.us)\b", re.IGNORECASE),
+        re.compile(r"https?://[^\s)]+(?:localhost|127\.0\.0\.1|[^/]+\.internal)\b", re.IGNORECASE),
     ]
     for path in _public_files():
         text = path.read_text(encoding="utf-8", errors="ignore")

@@ -1,6 +1,6 @@
-# Forbidden (fail closed)
+# Forbidden language (fail closed)
 
-Do not use these (any case, any capitalization):
+Do not use these phrases in the generated card, in any capitalization:
 
 - diagnosed
 - diagnosis
@@ -15,5 +15,7 @@ Do not use these (any case, any capitalization):
 - socially delayed
 - should act more normal
 - act more normal
+- cure autism
+- treat autism
 
-If the transcript never used a clinical term, the report must not introduce one.
+If the meeting did not use a clinical term, the card must not introduce one.

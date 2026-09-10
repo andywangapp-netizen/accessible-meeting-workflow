@@ -12,7 +12,7 @@ ROOT = repo_root()
 
 
 def test_sample_output_passes_classroom_support() -> None:
-    pack = load_pack(ROOT / "packs" / "autism")
+    pack = load_pack(ROOT)
     case = load_case(ROOT / "cases" / "frozen" / "classroom_support")
     output = read_text(ROOT / "examples" / "sample_dp_output.html")
     report = evaluate(
@@ -25,7 +25,7 @@ def test_sample_output_passes_classroom_support() -> None:
 
 
 def test_bad_output_fails() -> None:
-    pack = load_pack(ROOT / "packs" / "autism")
+    pack = load_pack(ROOT)
     case = load_case(ROOT / "cases" / "frozen" / "classroom_support")
     output = read_text(ROOT / "examples" / "sample_dp_output.fail.html")
     report = evaluate(
@@ -35,11 +35,13 @@ def test_bad_output_fails() -> None:
         facts=case["facts"],
     )
     assert report["pass"] is False
-    assert report["failures"]
+    assert "required_element:article.meeting-card" in report["failures"]
+    assert "required_element:article[aria-labelledby]" in report["failures"]
+    assert "forbidden_phrase" in report["failures"]
 
 
 def test_html_contract_rejects_markdown() -> None:
-    pack = load_pack(ROOT / "packs" / "autism")
+    pack = load_pack(ROOT)
     case = load_case(ROOT / "cases" / "frozen" / "classroom_support")
     report = evaluate(
         output="## One-sentence summary\nA meeting.",
@@ -52,7 +54,7 @@ def test_html_contract_rejects_markdown() -> None:
 
 
 def test_html_contract_rejects_active_content_and_remote_resources() -> None:
-    pack = load_pack(ROOT / "packs" / "autism")
+    pack = load_pack(ROOT)
     case = load_case(ROOT / "cases" / "frozen" / "team_standup")
     output = read_text(ROOT / "examples" / "sample_dp_output.html")
     output = output.replace(
@@ -71,7 +73,7 @@ def test_html_contract_rejects_active_content_and_remote_resources() -> None:
 
 
 def test_html_contract_rejects_sensitive_visible_text() -> None:
-    pack = load_pack(ROOT / "packs" / "autism")
+    pack = load_pack(ROOT)
     case = load_case(ROOT / "cases" / "frozen" / "team_standup")
     output = read_text(ROOT / "examples" / "sample_team_standup.html").replace(
         "Alex will review", "alex@example.org Alex will review", 1
@@ -87,7 +89,7 @@ def test_html_contract_rejects_sensitive_visible_text() -> None:
 
 
 def test_factual_gate_rejects_vague_decision_text() -> None:
-    pack = load_pack(ROOT / "packs" / "autism")
+    pack = load_pack(ROOT)
     case = load_case(ROOT / "cases" / "frozen" / "classroom_support")
     output = read_text(ROOT / "examples" / "sample_dp_output.html").replace(
         "<li>Keep the Thursday 3:15 slot.</li>",
@@ -104,19 +106,9 @@ def test_factual_gate_rejects_vague_decision_text() -> None:
 
 
 def test_team_standup_html_sample_contract() -> None:
-    pack = load_pack(ROOT / "packs" / "autism")
+    pack = load_pack(ROOT)
     case = load_case(ROOT / "cases" / "frozen" / "team_standup")
-    output = """<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Team standup report</title><style>body { line-height: 1.6; } :focus-visible { outline: 3px solid #05c; } @media (prefers-reduced-motion: reduce) { * { transition: none; } }</style></head>
-<body><main><h1>Team standup report</h1>
-<section><h2>One-sentence summary</h2><p>Alex will review the client memo Thursday morning.</p></section>
-<section><h2>What was decided</h2><ul><li>Alex reviews the client memo Thursday morning.</li></ul></section>
-<section><h2>What was not decided</h2><ul><li>The public page will not launch this week.</li><li>No header color was chosen.</li></ul></section>
-<section><h2>Next steps</h2><ol><li>Alex reviews the client memo Thursday morning.</li><li>Send the decision list by email.</li></ol></section>
-<section><h2>Possible confusion points</h2><ul><li>The launch and header color are still open.</li></ul></section>
-<section><h2>Presenting outline</h2><ol><li>Alex reviews the memo.</li><li>The launch and header color remain open.</li></ol></section>
-</main></body></html>"""
+    output = read_text(ROOT / "examples" / "sample_team_standup.html")
     report = evaluate(
         output=output,
         schema=pack["schema"],
@@ -127,7 +119,7 @@ def test_team_standup_html_sample_contract() -> None:
 
 
 def test_payload_exposes_only_public_html_contract() -> None:
-    pack = load_pack(ROOT / "packs" / "autism")
+    pack = load_pack(ROOT)
     case = load_case(ROOT / "cases" / "frozen" / "classroom_support")
     payload = build_payload(
         transcript=case["transcript"],

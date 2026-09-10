@@ -25,11 +25,11 @@ offline and deterministic.
 Run the checked-in examples first:
 
 ```bash
-ameval evaluate --skill packs/autism \
+ameval evaluate --skill . \
   --case cases/frozen/classroom_support \
   --output examples/sample_dp_output.html
 
-ameval evaluate --skill packs/autism \
+ameval evaluate --skill . \
   --case cases/frozen/team_standup \
   --output examples/sample_team_standup.html
 ```
@@ -41,8 +41,8 @@ also checked by the unit tests and must exit non-zero:
 pytest -q
 ```
 
-For a DP-node run, generate a case, attach **only** the transcript and
-`packs/autism/SKILL.md`, save the returned HTML under the gitignored `runs/`
+For a DP-node run, generate a case, attach **only** the transcript and the
+root `SKILL.md`, save the returned HTML under the gitignored `runs/`
 directory, and run the same command against that file. Keep the JSON verdict
 and the HTML page; do not upload account data, production traces, cookies,
 tokens, or real meeting content.

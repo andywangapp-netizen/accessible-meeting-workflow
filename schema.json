@@ -1,6 +1,6 @@
 {
-  "pack_id": "autism",
-  "title": "Autism-friendly meeting coach (HTML)",
+  "pack_id": "autism-friendly-meeting-card",
+  "title": "Autism-friendly meeting card",
   "output_format": "html",
   "required_headings": [
     "One-sentence summary",
@@ -17,6 +17,8 @@
     "meta[name=viewport]",
     "title",
     "main",
+    "article.meeting-card",
+    "article[aria-labelledby]",
     "h1",
     "section",
     "style",

@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Team standup report</title>
   <style>
-    body { max-width: 48rem; margin: 0 auto; padding: 1.5rem; color: #172033; background: #fff; font: 1rem/1.6 system-ui, sans-serif; }
+    body { margin: 0; padding: 2rem 1rem; color: #172033; background: #eef3f7; font: 1.125rem/1.65 system-ui, sans-serif; }
+    .meeting-card { max-width: 46rem; margin: 0 auto; padding: 2rem; background: #fff; border: 2px solid #42566e; border-radius: 1rem; }
     h1, h2 { line-height: 1.25; }
     section { margin-block: 1.5rem; }
     li { margin-block: 0.45rem; }
@@ -15,7 +16,8 @@
 </head>
 <body>
   <main>
-    <h1>Team standup report</h1>
+    <article class="meeting-card" aria-labelledby="meeting-card-title">
+      <h1 id="meeting-card-title">Team standup report</h1>
     <section>
       <h2>One-sentence summary</h2>
       <p>Alex will review the client memo Thursday morning.</p>
@@ -40,6 +42,7 @@
       <h2>Presenting outline</h2>
       <ol><li>Alex reviews the memo.</li><li>The launch and header color remain open.</li></ol>
     </section>
+    </article>
   </main>
 </body>
 </html>

@@ -44,13 +44,13 @@ Use the shipped sample report, or any HTML document you captured from a model:
 ```bash
 # Score the good HTML sample (should PASS)
 ameval evaluate \
-  --skill packs/autism \
+  --skill . \
   --case cases/frozen/classroom_support \
   --output examples/sample_dp_output.html
 
 # Score the bad HTML sample (should FAIL)
 ameval evaluate \
-  --skill packs/autism \
+  --skill . \
   --case cases/frozen/classroom_support \
   --output examples/sample_dp_output.fail.html
 ```
@@ -61,7 +61,7 @@ Make a fresh synthetic case, then score against it:
 ameval generate --template classroom_support --out cases/generated/classroom_support
 
 ameval evaluate \
-  --skill packs/autism \
+  --skill . \
   --case cases/generated/classroom_support \
   --output runs/<id>/output.html
 ```
@@ -90,8 +90,8 @@ Exit code `0` from `evaluate` means PASS. Non-zero means FAIL.
 
 ## What a passing report looks like
 
-The autism pack requires one complete HTML document. It must include these
-`<h2>` headings, in this order:
+The root `SKILL.md` requires one complete HTML document with a labelled
+`article.meeting-card`. It must include these `<h2>` headings, in this order:
 
 - `<h2>One-sentence summary</h2>`
 - `<h2>What was decided</h2>`
@@ -102,7 +102,7 @@ The autism pack requires one complete HTML document. It must include these
 
 The scorer also checks:
 
-- Fails on diagnostic or shaming phrases (`packs/autism/forbidden.md`)
+- Fails on diagnostic or shaming phrases (`forbidden.md`)
 - Checks `facts.json` so the report does not invent decisions
 - Requires a single `<main>`, responsive metadata, readable inline CSS,
   visible focus styling, and reduced-motion support
@@ -114,8 +114,21 @@ The scorer also checks:
 Pass a skill **manually**. Do not ask the model to invent a disability pack during eval.
 
 ```bash
-ameval evaluate --skill packs/autism --case cases/frozen/classroom_support --output path/to/output.html
+ameval evaluate --skill . --case cases/frozen/classroom_support --output path/to/output.html
 ```
+
+## Attach from GitHub to a DP node
+
+This repository is packaged as one skill: `SKILL.md` is at the archive root,
+which lets Zoom Workflow scan it directly.
+
+1. Open the deep-reasoning node and expand **Skills**.
+2. Select **+**, then **GitHub repo**.
+3. Enter `andywangapp-netizen/accessible-meeting-workflow` and select **Scan**.
+4. Review `autism-friendly-meeting-card`, then attach it to the node.
+
+The node's instruction remains responsible for selecting meeting input and any
+Gmail recipient. The skill never infers a recipient from attendees.
 
 ## Production-shaped run (your public Zoom)
 
@@ -124,12 +137,12 @@ Use this when you want to exercise a real **deep-reasoning** node end-to-end.
 1. Generate a synthetic transcript (`ameval generate …`).
 2. Sign in to **public Zoom** (`zoom.us`) in Chrome **yourself**. Do not put a password, cookie, or JWT in this repo.
 3. Codex or Coworker may drive Chrome (**Computer Use** or a Chrome helper) **after** you are logged in. If a login wall appears, stop automation and finish login yourself.
-4. In the Zoom Workflow plugin, attach the transcript and `packs/autism/SKILL.md`, run the deep-reasoning node, and save the visible HTML report to `runs/<id>/output.html` (`runs/` is gitignored).
+4. In the Zoom Workflow plugin, attach the root `SKILL.md`, run the deep-reasoning node, and save the visible HTML card to `runs/<id>/output.html` (`runs/` is gitignored).
 5. Score it:
 
 ```bash
 ameval evaluate \
-  --skill packs/autism \
+  --skill . \
   --case cases/generated/classroom_support \
   --output runs/<id>/output.html
 ```
@@ -138,7 +151,7 @@ Optional payload to paste or POST:
 
 ```bash
 ameval pack-payload \
-  --skill packs/autism \
+  --skill . \
   --case cases/generated/classroom_support \
   --out runs/payload.json
 ```
@@ -152,7 +165,9 @@ More detail: [docs/public-run.md](docs/public-run.md), [docs/chrome-auth.md](doc
 ```text
 README.md                 This file
 ETHICS.md                 Data and language rules
-packs/autism/             The only skill (HTML instructions, schema, rubric, forbidden)
+SKILL.md                  The single GitHub-importable autism-friendly card skill
+schema.json               Deterministic HTML output contract
+rubric.md / forbidden.md  Public evaluation and respectful-language rules
 cases/frozen/             Checked-in synthetic meetings
 cases/generated/          Your generated copies (ok to gitignore locally)
 examples/                 Sample PASS / FAIL reports

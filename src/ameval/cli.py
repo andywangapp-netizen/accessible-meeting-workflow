@@ -15,7 +15,7 @@ from ameval.verify import evaluate
 
 
 def _add_skill_case(p: argparse.ArgumentParser) -> None:
-    p.add_argument("--skill", required=True, help="Skill pack directory, e.g. packs/autism")
+    p.add_argument("--skill", required=True, help="Skill directory, e.g. the repository root (.)")
     p.add_argument("--case", required=True, help="Case directory with transcript.md and facts.json")
 
 

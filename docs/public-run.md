@@ -8,7 +8,7 @@ generate transcript → evaluate(skill, output file)
 
 No network. This is enough to measure a deep-reasoning **skill** if you already have the model output.
 
-For `packs/autism`, the model output must be a standalone HTML document. The
+For the root `SKILL.md`, the model output must be a standalone HTML document. The
 evaluator does not render or execute it; it parses the document and applies the
 pack's structural, accessibility, safety, and fact-grounding gates.
 
@@ -46,4 +46,4 @@ synthetic transcript
   → ameval evaluate
 ```
 
-Pass the skill **manually** (`--skill packs/autism`). Do not ask the model to invent a disability pack during eval.
+Pass the skill **manually** (`--skill .`). Do not ask the model to invent a disability pack during eval.

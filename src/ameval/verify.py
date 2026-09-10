@@ -1,9 +1,9 @@
 """Score a deep-reasoning report against a pack schema and case facts.
 
-The public autism pack emits HTML.  The verifier therefore parses the
-document with the standard-library :mod:`html.parser` instead of trusting
-regular expressions for DOM and safety checks.  Markdown remains supported
-for small third-party packs that use the original schema shape.
+The public autism-friendly card skill emits HTML. The verifier therefore
+parses the document with the standard-library :mod:`html.parser` instead of
+trusting regular expressions for DOM and safety checks. Markdown remains
+supported for small third-party packs that use the original schema shape.
 """
 
 from __future__ import annotations
@@ -212,7 +212,7 @@ def _validate_html(output: str, schema: dict[str, Any]) -> dict[str, Any]:
         r"\bAKIA[0-9A-Z]{16}\b",
         r"\beyJ[a-zA-Z0-9_-]{20,}\.[a-zA-Z0-9_-]{10,}\.[a-zA-Z0-9_-]{10,}\b",
         r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b",
-        r"(?i)\b(?:zoomdev|git\.zoom\.us|corp\.zoom\.us)\b",
+        r"(?i)\b(?:localhost|127\.0\.0\.1|[a-z0-9.-]+\.internal)\b",
         r"(?i)\b(?:system|developer) prompt\b|\bhidden (?:rubric|instruction)s?\b|\bignore (?:all|any) previous\b",
     )
     if any(re.search(pattern, safety_text) for pattern in sensitive_patterns):
@@ -237,6 +237,28 @@ def _validate_html(output: str, schema: dict[str, Any]) -> dict[str, Any]:
         elif requirement in {"title", "main", "h1", "section", "style"}:
             if parser.tag_counts[requirement] == 0:
                 failures.append("required_element:" + requirement)
+        elif requirement == "article.meeting-card":
+            cards = [
+                attrs
+                for tag, attrs in parser.elements
+                if tag == "article"
+                and "meeting-card" in (attrs.get("class") or "").split()
+            ]
+            if len(cards) != 1:
+                failures.append("required_element:article.meeting-card")
+        elif requirement == "article[aria-labelledby]":
+            labelled_by = {
+                (attrs.get("aria-labelledby") or "").strip()
+                for tag, attrs in parser.elements
+                if tag == "article" and (attrs.get("aria-labelledby") or "").strip()
+            }
+            h1_ids = {
+                (attrs.get("id") or "").strip()
+                for tag, attrs in parser.elements
+                if tag == "h1" and (attrs.get("id") or "").strip()
+            }
+            if not labelled_by or not labelled_by.intersection(h1_ids):
+                failures.append("required_element:article[aria-labelledby]")
         elif requirement == ":focus-visible" and ":focus-visible" not in parser.style_text:
             failures.append("required_css::focus-visible")
         elif requirement == "prefers-reduced-motion" and "prefers-reduced-motion" not in parser.style_text:
@@ -286,7 +308,7 @@ def evaluate(
     """Run fail-closed checks. Returns a JSON-serializable report.
 
     Args:
-        output: Model / deep-reasoning report (HTML for the public autism pack).
+        output: Model / deep-reasoning report (HTML for the public card skill).
         schema: Pack schema with ``required_headings``.
         forbidden_phrases: Lowercased or mixed phrases from forbidden.md.
         facts: Case ``decided`` / ``not_decided`` lists.
