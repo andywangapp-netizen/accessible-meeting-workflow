@@ -127,8 +127,9 @@ which lets Zoom Workflow scan it directly.
 3. Enter `andywangapp-netizen/accessible-meeting-workflow` and select **Scan**.
 4. Review `autism-friendly-meeting-card`, then attach it to the node.
 
-The node's instruction remains responsible for selecting meeting input and any
-Gmail recipient. The skill never infers a recipient from attendees.
+The node's instruction remains responsible for selecting meeting input and the
+Gmail recipient or recipient relation. The skill uses attendees only when the
+node explicitly requests that set.
 
 ## Production-shaped run (your public Zoom)
 

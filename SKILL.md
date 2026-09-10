@@ -1,6 +1,6 @@
 ---
 name: autism-friendly-meeting-card
-description: Turn grounded meeting content into a calm, predictable HTML follow-up card, with optional email delivery only when the node already has an explicit recipient.
+description: Turn grounded meeting content into a calm, predictable HTML follow-up card, with optional email delivery only when the node already defines the recipient or recipient relation.
 ---
 
 # Autism-friendly meeting card
@@ -84,11 +84,15 @@ them. Do not turn an open item into a commitment.
 
 Creating the card does not by itself authorize a send. If the node's own
 instruction explicitly requests Gmail delivery and supplies an exact recipient
-or a unique run-time recipient relation, use the configured Gmail capability to
-send the card once as the HTML body.
+or an explicit run-time recipient relation, use the configured Gmail capability
+to send the card once as the HTML body. A relation such as `all meeting
+attendees with resolved email addresses` is valid only when the node states it.
 
-- Never derive the recipient merely from meeting attendance.
-- Stop without sending when the recipient is absent or ambiguous.
+- Never choose attendees as recipients unless the node explicitly names that
+  attendee relation.
+- Stop without sending when the recipient or recipient relation is absent or
+  ambiguous. When a set is requested, include only verified members of that set
+  and do not broaden it.
 - Keep any supplied subject literal. Otherwise use a factual subject such as
   `Meeting follow-up: <meeting title>` only when the title is present.
 - Never claim delivery succeeded until Gmail returns provider confirmation.
