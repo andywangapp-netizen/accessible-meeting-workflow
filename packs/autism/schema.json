@@ -1,0 +1,37 @@
+{
+  "pack_id": "autism",
+  "title": "Autism-friendly meeting coach (HTML)",
+  "output_format": "html",
+  "required_headings": [
+    "One-sentence summary",
+    "What was decided",
+    "What was not decided",
+    "Next steps",
+    "Possible confusion points",
+    "Presenting outline"
+  ],
+  "required_elements": [
+    "!doctype",
+    "html[lang]",
+    "meta[charset]",
+    "meta[name=viewport]",
+    "title",
+    "main",
+    "h1",
+    "section",
+    "style",
+    ":focus-visible",
+    "prefers-reduced-motion"
+  ],
+  "forbidden_elements": [
+    "script",
+    "iframe",
+    "object",
+    "embed",
+    "link",
+    "base",
+    "form"
+  ],
+  "allow_external_resources": false,
+  "delivery_slot": "email"
+}

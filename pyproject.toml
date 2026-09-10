@@ -1,0 +1,26 @@
+[project]
+name = "accessible-meeting-workflow"
+version = "0.1.0"
+description = "Public intern project for an autism-friendly HTML meeting-coach skill and deep-reasoning scoring."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [{ name = "Accessible Meeting Workflow contributors" }]
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+
+[project.scripts]
+ameval = "ameval.cli:main"
+
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]

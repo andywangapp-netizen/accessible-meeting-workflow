@@ -1,0 +1,14 @@
+{
+  "case_id": "classroom_support",
+  "title": "Fictional classroom support check-in",
+  "decided": [
+    "Keep the Thursday 3:15 slot",
+    "Jordan emails a one-page recap today",
+    "Print the lab-safety card",
+    "Keep the same group-role card as last week"
+  ],
+  "not_decided": [
+    "Change the Wednesday exam date",
+    "Pick a new textbook"
+  ]
+}

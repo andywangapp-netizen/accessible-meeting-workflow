@@ -1,0 +1,11 @@
+{
+  "case_id": "team_standup",
+  "title": "Fictional team standup",
+  "decided": [
+    "Alex reviews the client memo Thursday morning"
+  ],
+  "not_decided": [
+    "Launch the public page this week",
+    "Header color"
+  ]
+}
