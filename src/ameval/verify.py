@@ -204,7 +204,9 @@ def _validate_html(output: str, schema: dict[str, Any]) -> dict[str, Any]:
     # The public pack must not become a transport for credentials, internal
     # hosts, or prompt-injection text.  These are deliberately conservative
     # shape checks; they do not attempt to classify ordinary meeting prose.
-    safety_text = parser.visible_text
+    # Scan the raw document as well as rendered text so sensitive values in a
+    # title, heading, comment, or attribute cannot hide from the gate.
+    safety_text = output
     sensitive_patterns = (
         r"-----BEGIN [A-Z ]+PRIVATE KEY-----",
         r"\bAKIA[0-9A-Z]{16}\b",
