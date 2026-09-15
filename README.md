@@ -119,17 +119,31 @@ ameval evaluate --skill . --case cases/frozen/classroom_support --output path/to
 
 ## Attach from GitHub to a DP node
 
-This repository is packaged as one skill: `SKILL.md` is at the archive root,
-which lets Zoom Workflow scan it directly.
+This repository contains two skills:
+
+- `SKILL.md`: production meeting follow-up email generation.
+- `skills/autism-friendly-meeting-card-test/SKILL.md`: testing-only simulated
+  transcript review through HITL, followed by email body generation.
+
+The production entry point remains at the root for the existing import and
+evaluation workflow. The test variant uses the conventional `skills/<name>/`
+layout. Discovery of both entries still needs verification in Zoom Workflow;
+its scanner's handling of a root skill alongside nested skills is unconfirmed.
 
 1. Open the deep-reasoning node and expand **Skills**.
 2. Select **+**, then **GitHub repo**.
 3. Enter `andywangapp-netizen/accessible-meeting-workflow` and select **Scan**.
-4. Review `autism-friendly-meeting-card`, then attach it to the node.
+4. For production, attach `autism-friendly-meeting-card`. For a testing run,
+   select `autism-friendly-meeting-card-test` if the scanner lists it. Attach
+   only the intended variant to a node.
 
-The node's instruction remains responsible for selecting meeting input and the
-Gmail recipient or recipient relation. The skill uses attendees only when the
-node explicitly requests that set.
+Repository scans read GitHub, not local edits. Publish layout changes before
+rescanning. If the test skill is still absent, inspect the scanner's supported
+folder layouts before changing the working production entry point.
+
+The workflow supplies meeting input. The downstream Gmail node owns recipients,
+subject, approval, and delivery. See [test setup](docs/public-run.md#testing-without-a-real-meeting-transcript)
+for the test variant's HITL and skip routing requirements.
 
 ## Production-shaped run (your public Zoom)
 
@@ -166,7 +180,8 @@ More detail: [docs/public-run.md](docs/public-run.md), [docs/chrome-auth.md](doc
 ```text
 README.md                 This file
 ETHICS.md                 Data and language rules
-SKILL.md                  The single GitHub-importable autism-friendly card skill
+SKILL.md                  Production autism-friendly card skill
+skills/                   Separately selectable testing skill
 schema.json               Deterministic HTML output contract
 rubric.md / forbidden.md  Public evaluation and respectful-language rules
 cases/frozen/             Checked-in synthetic meetings

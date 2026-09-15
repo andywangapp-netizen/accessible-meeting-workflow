@@ -72,9 +72,9 @@ Pass the skill **manually** (`--skill .`). Do not ask the model to invent a disa
 
 ## Testing without a real meeting transcript
 
-Use the separate [testing skill](../testing/autism-friendly-meeting-card-test/SKILL.md)
+Use the separate [testing skill](../skills/autism-friendly-meeting-card-test/SKILL.md)
 in a test workflow instead of the production skill. It is self-contained; when
-packaging it for import, use `testing/autism-friendly-meeting-card-test/` as the
+packaging it for import, use `skills/autism-friendly-meeting-card-test/` as the
 skill root. Attach only this variant to the test reasoning node.
 
 The test node needs a human-input/clarification capability that can pause for

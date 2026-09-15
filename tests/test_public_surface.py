@@ -27,7 +27,7 @@ def test_only_production_and_testing_autism_skills_are_public() -> None:
     skill_paths = [path.relative_to(ROOT).as_posix() for path in ROOT.rglob("SKILL.md")]
     assert sorted(skill_paths) == [
         "SKILL.md",
-        "testing/autism-friendly-meeting-card-test/SKILL.md",
+        "skills/autism-friendly-meeting-card-test/SKILL.md",
     ]
 
 
