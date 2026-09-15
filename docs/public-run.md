@@ -38,16 +38,22 @@ The first delivery channel is email. The evaluator checks that the report can be
 
 ### Skip email when the transcript is unavailable
 
-Require actual readable, non-empty transcript text before generating and sending
-an email. Check the transcript after any retrieval step; a recording reference,
-meeting metadata, notes, or summary alone does not satisfy this condition.
-Route missing, empty, failed, or uncertain retrieval results to an end branch
-without Gmail. Only the positive branch proceeds to AI generation and sending.
-As a second guard, require a non-empty AI response before Gmail. The skill
-returns an empty response when it cannot obtain a transcript; it cannot stop
-a downstream node by itself. Configure these conditions in Zoom; changing
-`SKILL.md` does not change the deployed workflow. The existing HTML scorer
-scores generated cards, not skipped runs.
+Require actual readable, non-empty transcript text before generating an email.
+A recording reference, meeting metadata, notes, or summary alone does not
+satisfy this requirement. If no usable transcript can be obtained, the skill
+returns exactly `Skipped: no transcript available` as plain text.
+
+Configure the condition after AI reasoning:
+
+- `response` equals `Skipped: no transcript available` → Output node, with key
+  `status` and value set to the AI node's `response` variable.
+- A successful HTML email response → Gmail, using `response` as Email Body.
+- Empty, missing, or unexpected output → a no-send Output branch, not Gmail.
+
+Do not use “response is not empty” as the send condition: the skip message is
+also non-empty. Do not leave Gmail on an unrestricted default branch. Changing
+`SKILL.md` does not configure these routes in Zoom. The existing HTML scorer
+scores generated cards, not skip status messages.
 
 Verify with two workflow runs: a supplied transcript reaches email approval;
 a missing transcript never reaches the Gmail node.
@@ -78,17 +84,17 @@ tools or configure Zoom. Availability of such a tool must be verified in your
 Zoom node; Gmail's send approval alone is not transcript review.
 
 In this test workflow only, allow the reasoning node to run without an upstream
-real-transcript condition. Keep the condition after reasoning: send only when
-`response` is non-empty. Keep the production transcript condition unchanged.
+real-transcript condition. Keep the condition after reasoning described above:
+route the exact skip message to Output and only successful HTML to Gmail. Keep the production transcript condition unchanged.
 Configure Gmail with a test recipient and send approval when exercising delivery.
 
 Manual checks in Zoom:
 
 - Approve: the node pauses for review, then returns labelled HTML using the fixture.
 - Edit and approve: the HTML reflects the edited transcript, including removed facts.
-- Cancel: the response is empty and Gmail is skipped.
-- No HITL tool or failed interaction: the response is empty and Gmail is skipped.
+- Cancel: the response is `Skipped: no transcript available` and Gmail is skipped.
+- No HITL tool or failed interaction: the response is `Skipped: no transcript available` and Gmail is skipped.
 - Pending review: the node does not complete and Gmail does not run.
 
 These runtime checks require Zoom; local skill validation does not prove that
-Zoom exposes a human-input tool or that its condition handles empty output.
+Zoom exposes a human-input tool or that its condition routes skip messages correctly.
