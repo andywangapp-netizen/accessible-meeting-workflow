@@ -23,9 +23,12 @@ def _public_files() -> list[Path]:
     return files
 
 
-def test_only_autism_skill_is_public() -> None:
+def test_only_production_and_testing_autism_skills_are_public() -> None:
     skill_paths = [path.relative_to(ROOT).as_posix() for path in ROOT.rglob("SKILL.md")]
-    assert skill_paths == ["SKILL.md"]
+    assert sorted(skill_paths) == [
+        "SKILL.md",
+        "testing/autism-friendly-meeting-card-test/SKILL.md",
+    ]
 
 
 def test_public_files_have_no_credential_material() -> None:
