@@ -9,6 +9,16 @@ delivery slot; this harness never sends it.
 
 This is a **small public harness**. There are no real customer accounts, hidden answer keys, or private APIs here.
 
+## Local coaching website prototype
+
+The `test-features` branch also includes a structured, single-person coaching website in [`prototype/`](prototype/README.md). Enter a fictional transcript or generate a scenario, select yourself, and explore **I’m stuck**, guided practice, and a personal plan. It needs no Zoom access or API credentials.
+
+```bash
+python3 -m http.server 4173 --bind 127.0.0.1 --directory prototype
+```
+
+Open http://127.0.0.1:4173. The prototype uses scripted coaching and excerpt-based recaps; it is separate from the production email workflow below.
+
 ## Two jobs
 
 1. **Generate a synthetic meeting transcript** and pack it for a public Zoom Workflow / Codex plugin run.

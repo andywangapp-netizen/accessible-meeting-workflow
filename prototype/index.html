@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="A private, local prototype for preparing and practicing meeting conversations, one person at a time."
+    />
+    <title>Meeting Coach · Practice space</title>
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="./styles.css" />
+    <script type="module" src="./app.mjs"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to your workspace</a>
+    <aside class="sidebar" aria-label="About this practice space">
+      <a class="brand" href="./" aria-label="Meeting Coach home"
+        ><span class="brand-mark" aria-hidden="true">m<span>c</span></span
+        ><span
+          >Meeting<br />
+          Coach</span
+        ></a
+      >
+      <div class="sidebar-body">
+        <p class="eyebrow">YOUR PRACTICE SPACE</p>
+        <h2>A little space<br />to find your words.</h2>
+        <p>Prepare, pause, and work through a meeting at your own pace.</p>
+      </div>
+      <div class="session-badge">
+        <span class="avatar" id="sidebar-avatar" aria-hidden="true">A</span>
+        <div>
+          <span class="small-label">Coaching for</span
+          ><strong id="sidebar-person">Choose yourself</strong>
+        </div>
+      </div>
+      <div class="sidebar-foot">
+        <p>One person. Your goals.</p>
+        <p>No messages are sent. This session clears when you reload.</p>
+        <span class="prototype-pill">LOCAL PROTOTYPE</span>
+      </div>
+    </aside>
+    <main id="main">
+      <header class="page-header">
+        <div>
+          <p class="eyebrow">MEETING SUPPORT / PRACTICE</p>
+          <h1>Your meeting, at your pace.</h1>
+          <p>
+            You choose what to work on. Start with a fictional conversation.
+          </p>
+        </div>
+        <span class="private-label"
+          ><span aria-hidden="true">◈</span> Stays in this browser</span
+        >
+      </header>
+      <div class="workspace">
+        <section class="source-panel panel" aria-labelledby="setup-heading">
+          <div class="panel-heading">
+            <span class="step-number">01</span>
+            <div>
+              <p class="eyebrow">SET THE SCENE</p>
+              <h2 id="setup-heading">Your meeting</h2>
+            </div>
+          </div>
+          <div class="segmented" role="group" aria-label="Transcript source">
+            <button id="paste-mode" type="button" aria-pressed="true">
+              Enter transcript</button
+            ><button id="generate-mode" type="button" aria-pressed="false">
+              Make a scenario
+            </button>
+          </div>
+          <form id="generator" hidden>
+            <label for="generated-name">Your character’s name</label
+            ><input
+              id="generated-name"
+              value="Alex"
+              maxlength="50"
+              required
+              autocomplete="off"
+            />
+            <label for="setting">Meeting setting</label
+            ><select id="setting">
+              <option value="work">Work project</option>
+              <option value="study">Study group</option>
+              <option value="community">Community planning</option>
+            </select>
+            <label for="challenge">A moment to practice</label
+            ><select id="challenge">
+              <option value="clarity">An unclear assignment</option>
+              <option value="capacity">Too many tasks</option>
+              <option value="speaking">Finding a turn to speak</option>
+            </select>
+            <fieldset>
+              <legend>Conversation length</legend>
+              <div class="radio-row">
+                <label
+                  ><input type="radio" name="length" value="short" checked />
+                  Short</label
+                ><label
+                  ><input type="radio" name="length" value="long" /> More
+                  context</label
+                >
+              </div>
+            </fieldset>
+            <button class="button secondary full" type="submit">
+              Generate fictional transcript <span aria-hidden="true">↗</span>
+            </button>
+            <p id="generator-error" class="error" role="alert"></p>
+          </form>
+          <form id="session-form">
+            <div class="label-row">
+              <label for="transcript">Fictional transcript</label
+              ><button class="text-button" id="load-example" type="button">
+                Load example
+              </button>
+            </div>
+            <textarea
+              id="transcript"
+              rows="11"
+              maxlength="30000"
+              spellcheck="false"
+              aria-describedby="transcript-help"
+              required
+            ></textarea>
+            <p class="hint" id="transcript-help">
+              Use “Name: what they said” on each line. Fictional meetings only.
+            </p>
+            <label for="person">Which person are you?</label
+            ><select
+              id="person"
+              aria-describedby="person-help"
+              required
+            ></select>
+            <p class="hint" id="person-help">
+              All coaching is for this person only. Other speakers provide
+              context.
+            </p>
+            <p id="session-error" class="error" role="alert"></p>
+            <button class="button primary full" type="submit" id="start-button">
+              Open my coaching space <span aria-hidden="true">→</span>
+            </button>
+            <p id="source-status" class="hint" role="status"></p>
+          </form>
+          <div class="local-note">
+            <span aria-hidden="true">ⓘ</span>
+            <p>
+              Demo mode: scripted scenarios, transcript excerpts, and guided
+              exercises. No AI interpretation or Zoom connection.
+            </p>
+          </div>
+        </section>
+        <section class="coach-panel" aria-labelledby="coach-heading">
+          <div class="coach-heading">
+            <div>
+              <p class="eyebrow">02 / MAKE IT USEFUL FOR YOU</p>
+              <h2 id="coach-heading">Your coaching space</h2>
+            </div>
+            <span class="person-chip" id="person-chip"
+              >ONE PERSON AT A TIME</span
+            >
+          </div>
+          <nav class="coach-nav" aria-label="Coaching sections">
+            <button type="button" data-view="summary" aria-current="page">
+              Overview</button
+            ><button type="button" data-view="stuck">I’m stuck</button
+            ><button type="button" data-view="practice">
+              I want to work on…</button
+            ><button type="button" data-view="plan">
+              My plan <span id="plan-count">0</span>
+            </button>
+          </nav>
+          <div id="coach-content"></div>
+          <p class="coach-foot">
+            You can adapt any wording, skip an exercise, or take a break.
+          </p>
+        </section>
+      </div>
+      <div
+        id="announcement"
+        class="sr-only"
+        role="status"
+        aria-live="polite"
+      ></div>
+    </main>
+  </body>
+</html>
