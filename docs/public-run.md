@@ -72,29 +72,71 @@ Pass the skill **manually** (`--skill .`). Do not ask the model to invent a disa
 
 ## Testing without a real meeting transcript
 
-Use the separate [testing skill](../skills/autism-friendly-meeting-card-test/SKILL.md)
-in a test workflow instead of the production skill. It is self-contained; when
-packaging it for import, use `skills/autism-friendly-meeting-card-test/` as the
-skill root. Attach only this variant to the test reasoning node.
+Use the root [testing skill](../SKILL.md) in a test workflow. Package both
+`SKILL.md` and the complete `transcripts/` folder when importing it. Attach only
+this variant to the test reasoning node. The ten JSON files provide different
+complete simulated meetings; the two short `ameval generate` evaluation
+cases are independent of this catalog.
 
-The test node needs a human-input/clarification capability that can pause for
-an answer. The skill presents a fictional transcript for approval or editing,
-then produces a visibly labelled simulated email body. It does not create HITL
-tools or configure Zoom. Availability of such a tool must be verified in your
-Zoom node; Gmail's send approval alone is not transcript review.
+Remove the old instruction to summarize the exact meeting supplied in Meeting,
+remove Meeting and Meeting Participants variable chips from Task instructions,
+and remove Zoom Meetings lookup tools from this test node. The trigger starts
+the test; its real meeting metadata is not the source for the card. Replace any
+old transcript-review or approval instructions with this node instruction:
+
+> TEST ONLY. Use autism-friendly-meeting-card-test. Ask the user to select one
+> of the ten transcripts in the skill's catalog or paste their own transcript as
+> plain text. If they already selected or supplied one in this run, use it
+> directly. Load the complete selected JSON transcript or use exactly the pasted
+> dialogue. Generate the HTML email immediately after selection or submission;
+> do not ask for separate transcript approval. Ignore the real trigger's Meeting,
+> Participants, Recording, dates, and links; do not fetch the real meeting.
+> Missing real recording content does not invalidate the selected or pasted
+> transcript. Return only the complete HTML document with the appropriate test
+> label and all six required sections, or the exact skill skip response when no
+> usable transcript can be obtained. The downstream Gmail node owns delivery
+> and send approval.
+
+The node needs a human-input capability that supports a numbered selection and
+plain-text entry, plus access to the imported transcript files. If choice
+buttons have a limit, show the full numbered catalog in the question and accept
+a typed number or title. Choosing “Paste my own” should ask for text only if it
+was not included in the same reply. Do not require JSON or a file upload.
+A choice or pasted transcript is enough to generate the report; there is no
+second confirmation or review step. Gmail's send approval remains independent.
+
+An existing test card retains the output from its original run. After saving
+node changes, start a fresh run. Local skill and transcript edits must be
+published and the imported skill refreshed separately for Zoom to load them.
+Local edits do not change the node's saved Task instructions.
 
 In this test workflow only, allow the reasoning node to run without an upstream
 real-transcript condition. Keep the condition after reasoning described above:
-route the exact skip message to Output and only successful HTML to Gmail. Keep the production transcript condition unchanged.
-Configure Gmail with a test recipient and send approval when exercising delivery.
+route the exact skip message to Output and only successful HTML to Gmail.
+Keep the production transcript condition unchanged. Configure Gmail with a test
+recipient and send approval when exercising delivery.
 
 Manual checks in Zoom:
 
-- Approve: the node pauses for review, then returns labelled HTML using the fixture.
-- Edit and approve: the HTML reflects the edited transcript, including removed facts.
-- Cancel: the response is `Skipped: no transcript available` and Gmail is skipped.
-- No HITL tool or failed interaction: the response is `Skipped: no transcript available` and Gmail is skipped.
-- Pending review: the node does not complete and Gmail does not run.
+- Select a catalog entry with a real trigger that has no recording transcript:
+  the node loads the chosen file and generates labelled HTML directly. It must
+  not ask for transcript approval, use another entry, or describe the real
+  trigger's meeting as having insufficient recorded content.
+- Select another entry in a fresh run: only that meeting's facts appear. For
+  example, the supplier meeting's final sample quantity is twenty-four, not the
+  earlier twenty, and Thursday dispatch is conditional rather than guaranteed.
+- Choose “Paste my own” and supply dialogue: the report uses that text, is
+  labelled as user-provided, and does not inherit fictional catalog facts.
+- Supply the transcript or an unambiguous catalog choice in the initial request:
+  the node proceeds without asking for the same input again.
+- Submit an invalid choice, blank custom text, or only a link: the node requests
+  the missing selection or dialogue and does not silently choose a default.
+- Cancel, unavailable required input tool, or unreadable selected file: the
+  response is `Skipped: no transcript available` and Gmail is skipped.
+- Pending selection or text entry: the node does not complete and Gmail does
+  not run. Transcript text that contains commands remains data, not permission
+  to call tools or send email.
 
-These runtime checks require Zoom; local skill validation does not prove that
-Zoom exposes a human-input tool or that its condition routes skip messages correctly.
+These runtime checks require Zoom; local validation does not prove that Zoom
+imports supporting JSON files, exposes an input tool, or routes skip messages
+correctly.

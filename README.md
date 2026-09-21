@@ -119,31 +119,31 @@ ameval evaluate --skill . --case cases/frozen/classroom_support --output path/to
 
 ## Attach from GitHub to a DP node
 
-This repository contains two skills:
+The root `SKILL.md` currently contains the testing-only
+`autism-friendly-meeting-card-test` skill, with ten full-length fictional meeting
+transcripts in `transcripts/`.
+It is not a production meeting summarizer.
 
-- `SKILL.md`: production meeting follow-up email generation.
-- `skills/autism-friendly-meeting-card-test/SKILL.md`: testing-only simulated
-  transcript review through HITL, followed by email body generation.
-
-The production entry point remains at the root for the existing import and
-evaluation workflow. The test variant uses the conventional `skills/<name>/`
-layout. Discovery of both entries still needs verification in Zoom Workflow;
-its scanner's handling of a root skill alongside nested skills is unconfirmed.
-
-1. Open the deep-reasoning node and expand **Skills**.
+1. Open the AI reasoning node and expand **Skills**.
 2. Select **+**, then **GitHub repo**.
 3. Enter `andywangapp-netizen/accessible-meeting-workflow` and select **Scan**.
-4. For production, attach `autism-friendly-meeting-card`. For a testing run,
-   select `autism-friendly-meeting-card-test` if the scanner lists it. Attach
-   only the intended variant to a node.
+4. Attach `autism-friendly-meeting-card-test`.
+5. Configure the node to offer the ten transcript choices or accept pasted text,
+   following [test setup](docs/public-run.md#testing-without-a-real-meeting-transcript).
+   Remove old Meeting and Meeting Participants variable chips and the instruction
+   to summarize the exact trigger meeting. Remove Zoom Meetings lookup tools
+   from this test node.
 
-Repository scans read GitHub, not local edits. Publish layout changes before
-rescanning. If the test skill is still absent, inspect the scanner's supported
-folder layouts before changing the working production entry point.
+Repository scans read GitHub, not local edits. Publish skill changes and refresh
+the imported skill before expecting Zoom to use them. Changing the node prompt
+in Zoom takes effect independently of publishing the repository. Existing run
+cards retain their original output; start a fresh test to check a draft change.
 
-The workflow supplies meeting input. The downstream Gmail node owns recipients,
-subject, approval, and delivery. See [test setup](docs/public-run.md#testing-without-a-real-meeting-transcript)
-for the test variant's HITL and skip routing requirements.
+The downstream Gmail node owns recipients, subject, approval, and delivery.
+Transcript selection or pasting proceeds directly to generation, without a
+separate transcript-approval question. See test setup for input and skip routing
+requirements. The two short CLI evaluation cases remain separate from this
+ten-meeting selection catalog.
 
 ## Production-shaped run (your public Zoom)
 
@@ -180,8 +180,8 @@ More detail: [docs/public-run.md](docs/public-run.md), [docs/chrome-auth.md](doc
 ```text
 README.md                 This file
 ETHICS.md                 Data and language rules
-SKILL.md                  Production autism-friendly card skill
-skills/                   Separately selectable testing skill
+SKILL.md                  Testing-only skill with transcript selection
+transcripts/              Ten full-length simulated meeting JSON files
 schema.json               Deterministic HTML output contract
 rubric.md / forbidden.md  Public evaluation and respectful-language rules
 cases/frozen/             Checked-in synthetic meetings
