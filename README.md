@@ -121,14 +121,21 @@ ameval evaluate --skill . --case cases/frozen/classroom_support --output path/to
 
 The root `SKILL.md` currently contains the testing-only
 `autism-friendly-meeting-card-test` skill, with ten full-length fictional meeting
-transcripts in `transcripts/`.
+transcripts in `transcripts/`. The sync script combines them into one Drive JSON
+file for the reasoning node; dialogue is not embedded in the skill.
 It is not a production meeting summarizer.
+
+For updates to the Drive copies, use the [automatic transcript sync](docs/drive-sync.md).
+It supports local watch mode and a GitHub Actions workflow for changes pushed
+to `main`, updating the single combined Drive file in place.
 
 1. Open the AI reasoning node and expand **Skills**.
 2. Select **+**, then **GitHub repo**.
 3. Enter `andywangapp-netizen/accessible-meeting-workflow` and select **Scan**.
 4. Attach `autism-friendly-meeting-card-test`.
-5. Configure the node to offer the ten transcript choices or accept pasted text,
+5. Under **Resources → Google Drive**, select `zoom-transcripts.json`; see
+   [Drive sync setup](docs/drive-sync.md) for the file link.
+6. Configure the node to offer the ten transcript choices or accept pasted text,
    following [test setup](docs/public-run.md#testing-without-a-real-meeting-transcript).
    Remove old Meeting and Meeting Participants variable chips and the instruction
    to summarize the exact trigger meeting. Remove Zoom Meetings lookup tools
@@ -181,7 +188,7 @@ More detail: [docs/public-run.md](docs/public-run.md), [docs/chrome-auth.md](doc
 ```text
 README.md                 This file
 ETHICS.md                 Data and language rules
-SKILL.md                  Testing-only skill with transcript selection
+SKILL.md                  Testing-only skill with transcript resource selection
 transcripts/              Ten full-length simulated meeting JSON files
 schema.json               Deterministic HTML output contract
 rubric.md / forbidden.md  Public evaluation and respectful-language rules

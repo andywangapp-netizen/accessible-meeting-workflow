@@ -30,10 +30,20 @@ explicit communication preferences; no layout works for every autistic person.
    cannot display eleven choices, present the numbered list in the question and
    accept a number or title through its text field. Do not silently limit the
    menu, choose a default, or generate a replacement transcript.
-3. For a catalog choice, read the linked JSON file and use its complete
-   `transcript` string. Read only the selected file; the catalog descriptions
-   are not substitutes for the actual dialogue. Accept the number, exact title,
-   or file ID. Clarify an ambiguous or invalid selection instead of guessing.
+3. For a catalog choice, read the configured combined JSON file through the
+   workflow's Google Drive integration. Its `transcripts` array contains the
+   original transcript objects. Match the selected catalog ID or exact title
+   to exactly one object and use that object's complete `transcript` string.
+   Do not merge entries or summarize the entire bundle. The workflow supplies
+   the file link and reader; no Drive folder lookup is required. In a local
+   run, the corresponding repository JSON may be read directly.
+   Accept the number, exact title, or file ID. Clarify an ambiguous selection.
+   Verify that the actual selected dialogue is available before asking which
+   participant the user is. Retrieve the full resource if search returns only
+   excerpts. A title, scenario, snippet, or participant list is not enough.
+   Never compose, reconstruct, or extend a transcript, even for a testing run.
+   If the resource is missing, unreadable, or truncated and cannot be read in
+   full, use the skip response below; never invent replacement dialogue.
 4. For “Paste my own,” use the plain text in the same reply when provided.
    Otherwise prompt once for the transcript text. Accept readable meeting
    dialogue without requiring JSON, timestamps, specific speaker labels, or a
@@ -47,7 +57,7 @@ explicit communication preferences; no layout works for every autistic person.
    the user to approve, confirm, or review the transcript as a separate step.
    If the user explicitly supplies replacement text before generation, use that
    text instead of retaining details from the previous source.
-6. If the user cancels, the selected file cannot be read, a required input tool
+6. If the user cancels, the selected transcript resource is unavailable, a required input tool
    fails or is unavailable, or no usable transcript or participant selection
    can be obtained, return
    exactly `Skipped: no transcript available` as plain text, with no quotes,
@@ -92,8 +102,10 @@ discussion, clarification, and closing recaps. All people and events in these
 bundled files are fictional. Each file has `id`, `title`, `simulated`,
 `scenario`, `participants`, `duration_seconds`, and a full timestamped plain-text
 `transcript`. The timestamps are elapsed time within the simulated meeting,
-not dates or times from the real trigger. Package the `transcripts/` folder
-alongside this `SKILL.md` when importing the skill.
+not dates or times from the real trigger. The sync script combines these files
+into one Drive JSON resource with a `transcripts` array. Attach that single file
+through the workflow's Google Drive integration, separately from this skill.
+The catalog links identify local sources; they do not grant runtime file access.
 
 | Choice | Meeting transcript |
 |---|---|
@@ -114,9 +126,9 @@ repository as another fixture.
 
 ## Evidence rules
 
-- The selected file's full dialogue or the user-supplied plain text is the sole
+- The selected resource's full dialogue or the user-supplied plain text is the sole
   source of meeting facts. Keep it available after the input tool resumes.
-  Use the selected file's title for its meeting title; its scenario description
+  Use the selected resource's title for its meeting title; its scenario description
   is orientation, not evidence of additional decisions.
 - The trigger's Meeting, Meeting Participants, Recording, timestamps, and links
   are not evidence for this email. Do not fetch them or copy them into the card.

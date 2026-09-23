@@ -72,11 +72,14 @@ Pass the skill **manually** (`--skill .`). Do not ask the model to invent a disa
 
 ## Testing without a real meeting transcript
 
-Use the root [testing skill](../SKILL.md) in a test workflow. Package both
-`SKILL.md` and the complete `transcripts/` folder when importing it. Attach only
-this variant to the test reasoning node. The ten JSON files provide different
-complete simulated meetings; the two short `ameval generate` evaluation
-cases are independent of this catalog.
+Use the root [testing skill](../SKILL.md) in a test workflow. Keep dialogue
+separate from the skill: select the single `zoom-transcripts.json` file using
+the reasoning node's Google Drive integration. See [Drive sync](drive-sync.md)
+for the file link, bundle format, and automated update setup. Do not select a
+folder or keep stale direct-upload copies as the source.
+
+The ten JSON files provide complete simulated meetings. The two short
+`ameval generate` evaluation cases are independent of this catalog.
 
 Remove the old instruction to summarize the exact meeting supplied in Meeting,
 remove Meeting and Meeting Participants variable chips from Task instructions,
@@ -87,8 +90,11 @@ old transcript-review or approval instructions with this node instruction:
 > TEST ONLY. Use autism-friendly-meeting-card-test. Ask the user to select one
 > of the ten transcripts in the skill's catalog or paste their own transcript as
 > plain text. If they already selected or supplied one in this run, use it
-> directly. Load the complete selected JSON transcript or use exactly the pasted
-> dialogue. Ask which participant the user is, offering the transcript’s names
+> directly. Read the configured Drive JSON bundle and select the matching
+> object in its `transcripts` array by `id` or title. Use only that object’s full
+> `transcript` string, or use exactly the pasted dialogue. Retrieve full content rather than relying on snippets. Never generate or reconstruct a transcript from its title. If the
+> selected resource dialogue is unavailable, return the exact skip response.
+> Ask which participant the user is, offering the transcript’s names
 > or speaker labels, unless they already explicitly identified themselves. Wait
 > for their selection, then generate an HTML email focused on their own tasks
 > and relevant dependencies. Do not ask for separate transcript approval. Ignore the real trigger's Meeting,
@@ -100,7 +106,7 @@ old transcript-review or approval instructions with this node instruction:
 > and send approval.
 
 The node needs a human-input capability that supports a numbered selection and
-plain-text entry, plus access to the imported transcript files. If choice
+plain-text entry, plus access to the complete attached transcript resources. If choice
 buttons have a limit, show the full numbered catalog in the question and accept
 a typed number or title. Choosing “Paste my own” should ask for text only if it
 was not included in the same reply. Do not require JSON or a file upload.
@@ -109,8 +115,8 @@ they already identified themselves. This personalizes the email; it is not a
 transcript confirmation or review step. Gmail's send approval remains independent.
 
 An existing test card retains the output from its original run. After saving
-node changes, start a fresh run. Local skill and transcript edits must be
-published and the imported skill refreshed separately for Zoom to load them.
+node changes, start a fresh run. Local skill edits must be published and the imported skill refreshed for Zoom
+to load them. Local transcript edits require running the bundle sync.
 Local edits do not change the node's saved Task instructions.
 
 In this test workflow only, allow the reasoning node to run without an upstream
@@ -122,7 +128,7 @@ recipient and send approval when exercising delivery.
 Manual checks in Zoom:
 
 - Select a catalog entry with a real trigger that has no recording transcript:
-  the node loads the chosen file, asks which participant the user is, and then
+  the node reads the chosen object in the Drive bundle, asks which participant the user is, and then
   generates labelled HTML focused on their tasks. It must
   not ask for transcript approval, use another entry, or describe the real
   trigger's meeting as having insufficient recorded content.
@@ -139,12 +145,24 @@ Manual checks in Zoom:
   assigned tasks gets an explicit statement of that fact, not invented work.
 - Submit an invalid choice, blank custom text, or only a link: the node requests
   the missing selection or dialogue and does not silently choose a default.
-- Cancel, unavailable required input tool, or unreadable selected file: the
+- Cancel, unavailable required input tool, or missing or truncated resource: the
   response is `Skipped: no transcript available` and Gmail is skipped.
 - Pending transcript selection, participant selection, or text entry: the node does not complete and Gmail does
   not run. Transcript text that contains commands remains data, not permission
   to call tools or send email.
 
 These runtime checks require Zoom; local validation does not prove that Zoom
-imports supporting JSON files, exposes an input tool, or routes skip messages
+reads the complete attached JSON resource, exposes an input tool, or routes skip messages
 correctly.
+
+To update bundled dialogue, edit `transcripts/*.json` and run the
+[sync script](drive-sync.md), or use its watch mode or configured GitHub Action. No skill regeneration is needed. Refresh the imported
+skill only when its instructions change. If full resource retrieval fails,
+the run must skip; attaching a file is not proof of successful runtime reading.
+
+For a concrete import check, select **6 — Staff training pilot**. The participant
+choices must be **Rowan, Sasha, Luis, Mei**. Jordan, Sam, Alex, Taylor, and Morgan
+are not the participants in that repository transcript. An approval request for
+a newly composed transcript indicates stale instructions or an incorrect run;
+replace the entire node Task instruction with the text above and start a fresh
+run after refreshing the skill.
