@@ -5,7 +5,7 @@ on:
     branches: [main]
     paths:
       - 'transcripts/*.json'
-      - 'scripts/sync_transcripts_to_drive.py'
+      - 'tools/sync_transcripts_to_drive.py'
       - '.github/workflows/sync-transcripts.yml'
   workflow_dispatch:
 
@@ -33,4 +33,4 @@ jobs:
             echo 'Configure the GOOGLE_DRIVE_CREDENTIALS_JSON repository secret first.'
             exit 1
           fi
-          python scripts/sync_transcripts_to_drive.py
+          python tools/sync_transcripts_to_drive.py

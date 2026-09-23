@@ -31,10 +31,10 @@ automatically; export variables in your shell or use ADC.
 ## Local edits
 
 ```sh
-python scripts/sync_transcripts_to_drive.py --build-only .tmp/zoom-transcripts.json
-python scripts/sync_transcripts_to_drive.py --dry-run
-python scripts/sync_transcripts_to_drive.py
-python scripts/sync_transcripts_to_drive.py --watch
+python tools/sync_transcripts_to_drive.py --build-only .tmp/zoom-transcripts.json
+python tools/sync_transcripts_to_drive.py --dry-run
+python tools/sync_transcripts_to_drive.py
+python tools/sync_transcripts_to_drive.py --watch
 ```
 
 Watch mode checks content every five seconds, syncs on startup and after local

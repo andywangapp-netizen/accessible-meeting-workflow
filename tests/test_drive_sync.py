@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-spec = importlib.util.spec_from_file_location('drive_sync', Path(__file__).resolve().parents[1] / 'scripts/sync_transcripts_to_drive.py')
+spec = importlib.util.spec_from_file_location('drive_sync', Path(__file__).resolve().parents[1] / 'tools/sync_transcripts_to_drive.py')
 sync = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(sync)
 
