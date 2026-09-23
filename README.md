@@ -140,8 +140,9 @@ in Zoom takes effect independently of publishing the repository. Existing run
 cards retain their original output; start a fresh test to check a draft change.
 
 The downstream Gmail node owns recipients, subject, approval, and delivery.
-Transcript selection or pasting proceeds directly to generation, without a
-separate transcript-approval question. See test setup for input and skip routing
+After transcript selection or pasting, the user selects which participant they
+are. The email focuses on their tasks, without a separate transcript-approval
+question. See test setup for input and skip routing
 requirements. The two short CLI evaluation cases remain separate from this
 ten-meeting selection catalog.
 

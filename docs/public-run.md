@@ -88,13 +88,15 @@ old transcript-review or approval instructions with this node instruction:
 > of the ten transcripts in the skill's catalog or paste their own transcript as
 > plain text. If they already selected or supplied one in this run, use it
 > directly. Load the complete selected JSON transcript or use exactly the pasted
-> dialogue. Generate the HTML email immediately after selection or submission;
-> do not ask for separate transcript approval. Ignore the real trigger's Meeting,
+> dialogue. Ask which participant the user is, offering the transcript’s names
+> or speaker labels, unless they already explicitly identified themselves. Wait
+> for their selection, then generate an HTML email focused on their own tasks
+> and relevant dependencies. Do not ask for separate transcript approval. Ignore the real trigger's Meeting,
 > Participants, Recording, dates, and links; do not fetch the real meeting.
 > Missing real recording content does not invalidate the selected or pasted
 > transcript. Return only the complete HTML document with the appropriate test
 > label and all six required sections, or the exact skill skip response when no
-> usable transcript can be obtained. The downstream Gmail node owns delivery
+> usable transcript or participant selection can be obtained. The downstream Gmail node owns delivery
 > and send approval.
 
 The node needs a human-input capability that supports a numbered selection and
@@ -102,8 +104,9 @@ plain-text entry, plus access to the imported transcript files. If choice
 buttons have a limit, show the full numbered catalog in the question and accept
 a typed number or title. Choosing “Paste my own” should ask for text only if it
 was not included in the same reply. Do not require JSON or a file upload.
-A choice or pasted transcript is enough to generate the report; there is no
-second confirmation or review step. Gmail's send approval remains independent.
+After loading the transcript, ask the user to select their participant unless
+they already identified themselves. This personalizes the email; it is not a
+transcript confirmation or review step. Gmail's send approval remains independent.
 
 An existing test card retains the output from its original run. After saving
 node changes, start a fresh run. Local skill and transcript edits must be
@@ -119,7 +122,8 @@ recipient and send approval when exercising delivery.
 Manual checks in Zoom:
 
 - Select a catalog entry with a real trigger that has no recording transcript:
-  the node loads the chosen file and generates labelled HTML directly. It must
+  the node loads the chosen file, asks which participant the user is, and then
+  generates labelled HTML focused on their tasks. It must
   not ask for transcript approval, use another entry, or describe the real
   trigger's meeting as having insufficient recorded content.
 - Select another entry in a fresh run: only that meeting's facts appear. For
@@ -129,11 +133,15 @@ Manual checks in Zoom:
   labelled as user-provided, and does not inherit fictional catalog facts.
 - Supply the transcript or an unambiguous catalog choice in the initial request:
   the node proceeds without asking for the same input again.
+- Select different participants in the same transcript across fresh runs: each
+  email focuses on the selected person’s tasks. Other owners remain named on
+  relevant dependencies; unrelated tasks are omitted. A participant with no
+  assigned tasks gets an explicit statement of that fact, not invented work.
 - Submit an invalid choice, blank custom text, or only a link: the node requests
   the missing selection or dialogue and does not silently choose a default.
 - Cancel, unavailable required input tool, or unreadable selected file: the
   response is `Skipped: no transcript available` and Gmail is skipped.
-- Pending selection or text entry: the node does not complete and Gmail does
+- Pending transcript selection, participant selection, or text entry: the node does not complete and Gmail does
   not run. Transcript text that contains commands remains data, not permission
   to call tools or send email.
 
