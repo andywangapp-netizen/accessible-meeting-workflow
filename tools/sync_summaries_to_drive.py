@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Combine transcript JSON files and update a single stable Drive file."""
+"""Combine summary JSON files and update a single stable Drive file."""
 
 import argparse
 import hashlib
@@ -26,17 +26,17 @@ def request(session, method, url, **kwargs):
 
 
 def build_bundle(directory):
-    transcripts = []
+    summaries = []
     for path in sorted(directory.glob("*.json")):
         meeting = json.loads(path.read_bytes())
         if (not isinstance(meeting, dict) or meeting.get("id") != path.stem or
-                not isinstance(meeting.get("transcript"), str) or
-                not meeting["transcript"].strip()):
-            raise ValueError(f"Invalid transcript: {path.name}")
-        transcripts.append(meeting)
-    if not transcripts:
-        raise ValueError(f"No transcript JSON files in {directory}")
-    return (json.dumps({"schema_version": 1, "transcripts": transcripts},
+                not isinstance(meeting.get("summary"), str) or
+                not meeting["summary"].strip()):
+            raise ValueError(f"Invalid summary: {path.name}")
+        summaries.append(meeting)
+    if not summaries:
+        raise ValueError(f"No summary JSON files in {directory}")
+    return (json.dumps({"schema_version": 2, "summaries": summaries},
                        ensure_ascii=False, indent=2) + "\n").encode("utf-8")
 
 
@@ -53,7 +53,7 @@ def sync(session, directory, file_id, dry_run=False):
         print("Bundle unchanged", flush=True)
         return "unchanged"
     if dry_run:
-        print("Would update transcript bundle", flush=True)
+        print("Would update summary bundle", flush=True)
         return "updated"
     request(session, "PATCH", f"{UPLOAD}/{file_id}",
             params={"uploadType": "media", "fields": "id", "supportsAllDrives": "true"},
@@ -61,7 +61,7 @@ def sync(session, directory, file_id, dry_run=False):
     verified = request(session, "GET", f"{API}/{file_id}", params=params)
     if verified.get("md5Checksum") != checksum:
         raise RuntimeError("Bundle upload verification failed")
-    print("Updated transcript bundle", flush=True)
+    print("Updated summary bundle", flush=True)
     return "updated"
 
 
@@ -79,9 +79,9 @@ def make_session():
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--file-id", default=os.environ.get("GOOGLE_DRIVE_TRANSCRIPTS_FILE_ID", FILE_ID))
+    parser.add_argument("--file-id", default=os.environ.get("GOOGLE_DRIVE_SUMMARIES_FILE_ID", FILE_ID))
     parser.add_argument("--build-only", type=Path, help="Write the combined JSON locally without authentication")
-    parser.add_argument("--directory", type=Path, default=ROOT / "transcripts")
+    parser.add_argument("--directory", type=Path, default=ROOT / "summaries")
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--watch", action="store_true", help="Check for content changes repeatedly")
     parser.add_argument("--interval", type=float, default=5)
@@ -93,7 +93,7 @@ def main():
         args.build_only.write_bytes(build_bundle(args.directory))
         return
     if not args.file_id:
-        parser.error("--file-id or GOOGLE_DRIVE_TRANSCRIPTS_FILE_ID is required")
+        parser.error("--file-id or GOOGLE_DRIVE_SUMMARIES_FILE_ID is required")
     session = make_session()
     previous = None
     while True:

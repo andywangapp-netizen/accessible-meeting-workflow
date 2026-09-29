@@ -2,11 +2,5 @@
   "id": "04_design_research",
   "title": "Research session planning",
   "simulated": true,
-  "scenario": "A product researcher, designer, and operations partner plan adult usability sessions and leave recruitment and incentive questions open.",
-  "participants": [
-    "the researcher",
-    "the designer",
-    "the operations partner"
-  ],
   "summary": "The research team planned sessions to see how people interpreted a label and navigated the current prototype. They chose to observe one version rather than compare alternative labels in the same session. Sessions would last thirty minutes, using fictional task data without requiring account creation. The team discussed neutral question wording and providing task instructions both verbally and in writing.\n\nPreparation included replacing an editable address field with a sample location, checking navigation and keyboard operation, and writing the facilitator guide. Prototype work was expected Wednesday afternoon and the guide Thursday morning. Recruitment arrangements and incentives still needed checking. Six sessions had been suggested, but the number of participants and session dates were not yet settled.\n"
 }

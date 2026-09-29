@@ -18,7 +18,7 @@ offline and deterministic.
   hidden instructions.
 - **Meeting fidelity:** decisions and open items agree with the case's
   `facts.json`; named owners and times are kept when they appear in the
-  transcript.
+  summary.
 
 ## Offline suite
 
@@ -41,7 +41,7 @@ also checked by the unit tests and must exit non-zero:
 pytest -q
 ```
 
-For a DP-node run, generate a case, attach **only** the transcript and the
+For a DP-node run, generate a case, attach **only** the summary and the
 root `SKILL.md`, save the returned HTML under the gitignored `runs/`
 directory, and run the same command against that file. Keep the JSON verdict
 and the HTML page; do not upload account data, production traces, cookies,

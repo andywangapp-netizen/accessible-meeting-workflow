@@ -1,10 +1,10 @@
-# Transcript sync to Google Drive
+# Summary sync to Google Drive
 
-The local `transcripts/*.json` files are combined into one
-[zoom-transcripts.json](https://drive.google.com/file/d/1ZuFUhpNjHCu6oINxXloEm3mdsu7dxd2d/view)
-in My Drive. The former Zoom Transcripts folder was moved to Trash.
-The bundle is `{ "schema_version": 1, "transcripts": [ ...original objects... ] }`.
-Objects are ordered by source filename and their fields and dialogue are preserved.
+The local `summaries/*.json` files are combined into one
+[zoom-summaries.json](https://drive.google.com/file/d/1ZuFUhpNjHCu6oINxXloEm3mdsu7dxd2d/view)
+in My Drive. The bundle retains the existing Drive file ID.
+The bundle is `{ "schema_version": 2, "summaries": [ ...original objects... ] }`.
+Objects are ordered by source filename and their fields and summary text are preserved.
 
 The sync script rebuilds the bundle, compares its checksum to the existing Drive
 file, and updates that same file ID when content changes. It verifies the remote
@@ -31,10 +31,10 @@ automatically; export variables in your shell or use ADC.
 ## Local edits
 
 ```sh
-python tools/sync_transcripts_to_drive.py --build-only .tmp/zoom-transcripts.json
-python tools/sync_transcripts_to_drive.py --dry-run
-python tools/sync_transcripts_to_drive.py
-python tools/sync_transcripts_to_drive.py --watch
+python tools/sync_summaries_to_drive.py --build-only .tmp/zoom-summaries.json
+python tools/sync_summaries_to_drive.py --dry-run
+python tools/sync_summaries_to_drive.py
+python tools/sync_summaries_to_drive.py --watch
 ```
 
 Watch mode checks content every five seconds, syncs on startup and after local
@@ -46,17 +46,17 @@ Run only one watcher/sync writer for this file at a time.
 
 Add the credential JSON as the repository Actions secret
 `GOOGLE_DRIVE_CREDENTIALS_JSON`, then publish the workflow and script.
-`.github/workflows/sync-transcripts.yml` syncs when transcript files change on
+`.github/workflows/sync-summaries.yml` syncs when summary files change on
 `main`; it also supports manual workflow dispatch. Concurrent Actions runs are
 serialized. Before those files are published and the secret is configured,
 automatic GitHub syncing is not active.
 
 ## Zoom integration
 
-Select the single `zoom-transcripts.json` file through Zoom's Google Drive
+Select the single `zoom-summaries.json` file through Zoom's Google Drive
 integration. Folders are not supported by this integration. The node must read
-the full selected object from its `transcripts` array, matched by `id` or title,
-then ask which participant the user is. Do not merge dialogue across entries.
+the full selected object from its `summaries` array, matched by `id` or title.
+Do not merge summary text across entries.
 Keep the Drive file link in workflow configuration, not in the generic skill.
 Updating Drive does not update old direct-upload Resources; replace those with
 the Drive-backed bundle. Runtime retrieval in Zoom still needs verification.

@@ -1,19 +1,19 @@
-name: Sync transcripts to Google Drive
+name: Sync summaries to Google Drive
 
 on:
   push:
     branches: [main]
     paths:
-      - 'transcripts/*.json'
-      - 'tools/sync_transcripts_to_drive.py'
-      - '.github/workflows/sync-transcripts.yml'
+      - 'summaries/*.json'
+      - 'tools/sync_summaries_to_drive.py'
+      - '.github/workflows/sync-summaries.yml'
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: transcript-drive-sync
+  group: summary-drive-sync
   cancel-in-progress: false
 
 jobs:
@@ -33,4 +33,4 @@ jobs:
             echo 'Configure the GOOGLE_DRIVE_CREDENTIALS_JSON repository secret first.'
             exit 1
           fi
-          python tools/sync_transcripts_to_drive.py
+          python tools/sync_summaries_to_drive.py

@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-spec = importlib.util.spec_from_file_location('drive_sync', Path(__file__).resolve().parents[1] / 'tools/sync_transcripts_to_drive.py')
+spec = importlib.util.spec_from_file_location('drive_sync', Path(__file__).resolve().parents[1] / 'tools/sync_summaries_to_drive.py')
 sync = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(sync)
 
@@ -35,7 +35,7 @@ class Drive:
 
 
 def fixture(tmp_path, name='sample'):
-    obj = {'id': name, 'title': 'Test', 'participants': ['Rowan'], 'transcript': 'Rowan: I will send the agenda. — Friday'}
+    obj = {'id': name, 'title': 'Test', 'participants': ['Rowan'], 'summary': 'Action item: Rowan will send the agenda Friday.'}
     (tmp_path / (name + '.json')).write_text(json.dumps(obj))
     return obj
 
@@ -44,7 +44,8 @@ def test_bundle_preserves_all_objects_in_stable_order(tmp_path):
     second = fixture(tmp_path, 'b')
     first = fixture(tmp_path, 'a')
     bundle = sync.build_bundle(tmp_path)
-    assert json.loads(bundle)['transcripts'] == [first, second]
+    assert json.loads(bundle)['schema_version'] == 2
+    assert json.loads(bundle)['summaries'] == [first, second]
     assert sync.build_bundle(tmp_path) == bundle
 
 
@@ -89,3 +90,13 @@ def test_wrong_target_type_and_failed_verification(tmp_path):
         sync.sync(Drive(mime='application/vnd.google-apps.folder'), tmp_path, 'stable-id')
     with pytest.raises(RuntimeError, match='verification failed'):
         sync.sync(Drive(corrupt=True), tmp_path, 'stable-id')
+
+
+@pytest.mark.parametrize("content", [None, "", "   ", 42])
+def test_summary_required_even_if_legacy_transcript_exists(tmp_path, content):
+    obj = {'id': 'sample', 'summary': content, 'transcript': 'Old dialogue'}
+    (tmp_path / 'sample.json').write_text(json.dumps(obj))
+    drive = Drive()
+    with pytest.raises(ValueError, match='Invalid summary'):
+        sync.sync(drive, tmp_path, 'stable-id')
+    assert drive.writes == []

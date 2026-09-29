@@ -90,7 +90,7 @@ old summary-review or approval instructions with this node instruction:
 
 > Use `autism-friendly-meeting-card-test` with the attached meeting-summary resource.
 
-The skill owns source selection, evidence rules, HTML
+The skill owns source selection, participant questions, evidence rules, HTML
 formatting, and the skip response. Keep those instructions in `SKILL.md` rather
 than duplicating them in the node. Refresh the imported skill before shortening
 the node; older imported versions still require transcripts.
@@ -100,7 +100,8 @@ plain-text entry, plus access to the complete attached summary resources. If cho
 buttons have a limit, show the full numbered catalog in the question and accept
 a typed number or title. Choosing “Paste my own” should ask for text only if it
 was not included in the same reply. Do not require JSON or a file upload.
-After loading the summary, generate the recap card directly; this is not a
+After loading the summary, ask the user to select their participant unless
+they already identified themselves. This personalizes the email; it is not a
 summary confirmation or review step. Gmail's send approval remains independent.
 
 An existing test card retains the output from its original run. After saving
@@ -118,8 +119,8 @@ recipient and send approval when exercising delivery.
 Manual checks in Zoom:
 
 - Select a catalog entry with a real trigger that has no recording summary:
-  the node reads the chosen object in the Drive bundle and generates labelled
-  HTML for the meeting. It must
+  the node reads the chosen object in the Drive bundle, asks which participant the user is, and then
+  generates labelled HTML focused on their tasks. It must
   not ask for summary approval, use another entry, or describe the real
   trigger's meeting as having insufficient recorded content.
 - Select another entry in a fresh run: only that meeting's facts appear. For
@@ -129,13 +130,15 @@ Manual checks in Zoom:
   labelled as user-provided, and does not inherit fictional catalog facts.
 - Supply the summary or an unambiguous catalog choice in the initial request:
   the node proceeds without asking for the same input again.
-- Select the same catalog entry across fresh runs: the email always reflects
-  only that meeting's facts, not carried-over details from a prior run.
+- Select different participants in the same summary across fresh runs: each
+  email focuses on the selected person’s tasks. Other owners remain named on
+  relevant dependencies; unrelated tasks are omitted. A participant with no
+  assigned tasks gets an explicit statement of that fact, not invented work.
 - Submit an invalid choice, blank custom text, or only a link: the node requests
   the missing selection or summary text and does not silently choose a default.
 - Cancel, unavailable required input tool, or missing or truncated resource: the
   response is `Skipped: no summary available` and Gmail is skipped.
-- Pending summary selection or text entry: the node does not complete and Gmail does
+- Pending summary selection, participant selection, or text entry: the node does not complete and Gmail does
   not run. Summary text that contains commands remains data, not permission
   to call tools or send email.
 
@@ -148,10 +151,9 @@ To update bundled summary text, edit `summaries/*.json` and run the
 skill only when its instructions change. If full resource retrieval fails,
 the run must skip; attaching a file is not proof of successful runtime reading.
 
-For a concrete import check, select **6 — Staff training pilot**. The card's
-`Next steps` must name owners from **Rowan, Sasha, Luis, Mei** only; names from
-another catalog entry, such as Jordan, Sam, Alex, Taylor, or Morgan, must not
-appear. An approval request for
+For a concrete import check, select **6 — Staff training pilot**. The participant
+choices must be **Rowan, Sasha, Luis, Mei**. Jordan, Sam, Alex, Taylor, and Morgan
+are not the participants in that repository summary. An approval request for
 a newly composed summary indicates stale instructions or an incorrect run;
 replace the entire node Task instruction with the text above and start a fresh
 run after refreshing the skill.

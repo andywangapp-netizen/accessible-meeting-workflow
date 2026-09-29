@@ -2,12 +2,5 @@
   "id": "03_incident_review",
   "title": "Service incident follow-up",
   "simulated": true,
-  "scenario": "An engineering team reviews a fictional outage, separates observations from hypotheses, and assigns investigation and prevention work.",
-  "participants": [
-    "the team lead",
-    "the reliability engineer",
-    "the on-call engineer",
-    "the support lead"
-  ],
   "summary": "The team reviewed the previous day's notification delay. The queue began growing at 9:12, an alert arrived at 9:20, and processing returned to normal at 9:41 after workers were restarted. The records checked had eventually completed. A deployment and worker restart occurred near the start of the incident, but the cause remained unclear; a connection-pool issue was one possibility to investigate.\n\nDiscussion covered trace analysis, whether alerting could detect delays sooner, and a support report of a duplicate confirmation after a retry. Engineers planned to compare the traces and test alternative alert rules before changing production settings. Support would communicate that processing had recovered and investigation was continuing. The recovery checklist also needed clearer wording about restarting workers rather than clearing the queue.\n"
 }

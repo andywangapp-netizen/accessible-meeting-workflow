@@ -122,13 +122,13 @@ def test_payload_exposes_only_public_html_contract() -> None:
     pack = load_pack(ROOT)
     case = load_case(ROOT / "cases" / "frozen" / "classroom_support")
     payload = build_payload(
-        transcript=case["transcript"],
+        summary=case["summary"],
         request=case["request"],
         skill_markdown=pack["skill_markdown"],
         schema=pack["schema"],
     )
     assert set(payload) == {
-        "transcript",
+        "summary",
         "request",
         "skill_markdown",
         "required_headings",

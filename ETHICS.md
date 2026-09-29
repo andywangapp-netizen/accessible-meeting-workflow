@@ -4,7 +4,7 @@ This project evaluates **communication support** after a meeting. It does not de
 
 ## Data
 
-- Use **synthetic** transcripts shipped in this repo, or new ones you invent.
+- Use **synthetic** summaries shipped in this repo, or new ones you invent.
 - Do not add real Zoom recordings, real student/patient meetings, or real disability status attached to a person.
 - Do not commit cookies, JWTs, passwords, or `.env` values.
 
