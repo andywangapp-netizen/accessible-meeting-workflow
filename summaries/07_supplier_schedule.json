@@ -1,0 +1,13 @@
+{
+  "id": "07_supplier_schedule",
+  "title": "Packaging delivery coordination",
+  "simulated": true,
+  "scenario": "A small manufacturer coordinates a sample packaging delivery without authorizing a full order or treating an estimate as a guarantee.",
+  "participants": [
+    "the account manager",
+    "the supplier contact",
+    "the design engineer",
+    "the quality tester"
+  ],
+  "summary": "The packaging team and supplier discussed a sample run to check how the proposed cartons fitted the product and its protective sleeve. A revised drawing was needed before production because the sleeve measurements were still being checked. They settled on twenty-four unprinted natural-board samples, which could be cut from one sheet for the quoted sample charge.\n\nThe revised drawing was expected Tuesday morning. If received by noon, the supplier anticipated dispatching the samples Thursday, with delivery timing to follow through tracking. The quality tester would use them for fit and handling checks after arrival. Final appearance and a larger production order were left for later, and the supplier would separately investigate white material. Shipping performance would require a different test plan.\n"
+}

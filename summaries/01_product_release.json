@@ -1,0 +1,13 @@
+{
+  "id": "01_product_release",
+  "title": "Product release readiness",
+  "simulated": true,
+  "scenario": "A software team reviews a limited beta, distinguishes blocking defects from proposals, and revises a deadline.",
+  "participants": [
+    "the release manager",
+    "the engineer",
+    "the QA tester",
+    "the beta coordinator"
+  ],
+  "summary": "The team reviewed readiness for the invite-only beta. Account creation and password reset were working, but exports were corrupting some accented names. Because several volunteer teams needed to download reports, invitations were put on hold until the export issue could be fixed and checked. The engineer expected to finish the code Wednesday afternoon and provide a test build Thursday at noon, with testing later Thursday or Friday morning depending on availability.\n\nThe group also discussed slow dashboard loading on larger workspaces and agreed to collect performance feedback during the beta. Volunteer teams would receive an update while invitation drafts were prepared. Wording suggesting a public release next month was removed because no launch date had been agreed.\n"
+}

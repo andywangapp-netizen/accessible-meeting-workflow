@@ -1,0 +1,13 @@
+{
+  "id": "10_workspace_move",
+  "title": "Shared workspace move",
+  "simulated": true,
+  "scenario": "An office coordinator and team representatives plan a trial move, distinguish temporary arrangements from permanent policy, and clarify equipment dependencies.",
+  "participants": [
+    "Harper",
+    "Quinn",
+    "Avery",
+    "Morgan"
+  ],
+  "summary": "The team planned a one-week trial in the east workspace to see how well it supported their work. Six desks were equipped, with two more monitors still expected. The current room would remain available during the trial. A shared booking schedule was proposed for the enclosed call room, and attendance information would be collected to help manage capacity.\n\nMonday was the proposed start, subject to network and docking checks on Thursday. Harper would confirm whether to proceed on Friday afternoon. Morgan would prepare an arrival guide, Quinn would check the equipment details, and Avery would gather intended attendance. The group also discussed storage, practical setup requests, and collecting feedback after the trial. Longer-term seating and use of the rooms would be considered later.\n"
+}

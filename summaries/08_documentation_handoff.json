@@ -1,0 +1,13 @@
+{
+  "id": "08_documentation_handoff",
+  "title": "Documentation handoff",
+  "simulated": true,
+  "scenario": "Writers and support staff reorganize a help guide, clarify ownership, and choose an interim delivery format while leaving localization dates open.",
+  "participants": [
+    "Iris",
+    "Theo",
+    "Grace",
+    "Pavel"
+  ],
+  "summary": "The team reviewed the account-setup guide ahead of a handoff to support. An outdated screenshot and changed button label needed attention, including confirmation that the training account matched the released product. They agreed to organise the guide around the normal setup sequence, followed by troubleshooting and a contents list. Support would contribute common questions and check the contact routes for staff and external accounts.\n\nTheo would coordinate the revisions and produce a new draft Thursday afternoon for Grace to review Friday morning. Pavel would confirm the screen details and prepare a glossary. The first internal trial would use a structured text document. Translation and public publication were discussed but had not been scheduled; the Friday date in the tracker referred to the glossary rather than a translated guide.\n"
+}

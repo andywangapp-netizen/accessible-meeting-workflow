@@ -1,0 +1,13 @@
+{
+  "id": "06_training_pilot",
+  "title": "Staff training pilot",
+  "simulated": true,
+  "scenario": "An internal learning team plans a small onboarding pilot, clarifies optional participation, and separates feedback gathering from employee assessment.",
+  "participants": [
+    "the program lead",
+    "the training designer",
+    "the content reviewer",
+    "the scheduling coordinator"
+  ],
+  "summary": "The learning team discussed a small pilot of its project-handoff training. The forty-five-minute session would involve around six volunteers working through a fictional handoff and discussing missing information. The group clarified that it was testing the training materials rather than assessing staff performance, and agreed to call the exercise a practice activity. An optional outline would be sent beforehand, with printed materials available during the session.\n\nThe activity and answer guide were due Friday afternoon, followed by a review Monday. Feedback would focus on which parts were clear and what needed improvement. Two Wednesday time slots were under consideration; an availability form would determine which to use. The team had not yet made plans for a wider rollout.\n"
+}

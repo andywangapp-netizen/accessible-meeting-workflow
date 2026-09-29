@@ -1,9 +1,9 @@
-# Public run: transcript → endpoint or plugin
+# Public run: summary → endpoint or plugin
 
 ## Offline (default)
 
 ```text
-generate transcript → evaluate(skill, output file)
+generate summary → evaluate(skill, output file)
 ```
 
 No network. This is enough to measure a deep-reasoning **skill** if you already have the model output.
@@ -16,7 +16,7 @@ pack's structural, accessibility, safety, and fact-grounding gates.
 
 `ameval pack-payload` writes a JSON file with only:
 
-- `transcript` (synthetic text)
+- `summary` (synthetic text)
 - `skill_markdown` (the public pack instructions you passed)
 - `request` (human instruction, e.g. email the coach report)
 - `required_headings` and `delivery_slot` (the public output contract)
@@ -36,16 +36,17 @@ If the variable is empty, the command prints the payload path and exits. That is
 
 The first delivery channel is email. The evaluator checks that the report can be an email body (required sections present). It does **not** send mail. Sending is your Zoom Workflow’s job after the plugin run.
 
-### Skip email when the transcript is unavailable
+### Skip email when the summary is unavailable
 
-Require actual readable, non-empty transcript text before generating an email.
-A recording reference, meeting metadata, notes, or summary alone does not
-satisfy this requirement. If no usable transcript can be obtained, the skill
-returns exactly `Skipped: no transcript available` as plain text.
+Require actual readable, non-empty summary text before generating an email.
+A readable prose or bullet-point meeting summary is sufficient; no transcript
+or recording is required. A recording reference or meeting metadata alone is
+not a summary. If no usable summary can be obtained, the skill
+returns exactly `Skipped: no summary available` as plain text.
 
 Configure the condition after AI reasoning:
 
-- `response` equals `Skipped: no transcript available` → Output node, with key
+- `response` equals `Skipped: no summary available` → Output node, with key
   `status` and value set to the AI node's `response` variable.
 - A successful HTML email response → Gmail, using `response` as Email Body.
 - Empty, missing, or unexpected output → a no-send Output branch, not Gmail.
@@ -55,13 +56,13 @@ also non-empty. Do not leave Gmail on an unrestricted default branch. Changing
 `SKILL.md` does not configure these routes in Zoom. The existing HTML scorer
 scores generated cards, not skip status messages.
 
-Verify with two workflow runs: a supplied transcript reaches email approval;
-a missing transcript never reaches the Gmail node.
+Verify with two workflow runs: a supplied summary reaches email approval;
+a missing summary never reaches the Gmail node.
 
 ## Production end-to-end (deep-reasoning node)
 
 ```text
-synthetic transcript
+synthetic summary
   → you sign in on public Zoom (Chrome)
   → Codex/Coworker plugin or Workflow UI runs deep reasoning with --skill
   → save output.html
@@ -70,10 +71,10 @@ synthetic transcript
 
 Pass the skill **manually** (`--skill .`). Do not ask the model to invent a disability pack during eval.
 
-## Testing without a real meeting transcript
+## Testing without a real meeting summary
 
-Use the root [testing skill](../SKILL.md) in a test workflow. Keep dialogue
-separate from the skill: select the single `zoom-transcripts.json` file using
+Use the root [testing skill](../SKILL.md) in a test workflow. Keep summary text
+separate from the skill: select the single `zoom-summaries.json` file using
 the reasoning node's Google Drive integration. See [Drive sync](drive-sync.md)
 for the file link, bundle format, and automated update setup. Do not select a
 folder or keep stale direct-upload copies as the source.
@@ -85,84 +86,87 @@ Remove the old instruction to summarize the exact meeting supplied in Meeting,
 remove Meeting and Meeting Participants variable chips from Task instructions,
 and remove Zoom Meetings lookup tools from this test node. The trigger starts
 the test; its real meeting metadata is not the source for the card. Replace any
-old transcript-review or approval instructions with this node instruction:
+old summary-review or approval instructions with this node instruction:
 
-> TEST ONLY. Use autism-friendly-meeting-card-test. Ask the user to select one
-> of the ten transcripts in the skill's catalog or paste their own transcript as
-> plain text. If they already selected or supplied one in this run, use it
-> directly. Read the configured Drive JSON bundle and select the matching
-> object in its `transcripts` array by `id` or title. Use only that object’s full
-> `transcript` string, or use exactly the pasted dialogue. Retrieve full content rather than relying on snippets. Never generate or reconstruct a transcript from its title. If the
-> selected resource dialogue is unavailable, return the exact skip response.
-> Ask which participant the user is, offering the transcript’s names
-> or speaker labels, unless they already explicitly identified themselves. Wait
-> for their selection, then generate an HTML email focused on their own tasks
-> and relevant dependencies. Do not ask for separate transcript approval. Ignore the real trigger's Meeting,
-> Participants, Recording, dates, and links; do not fetch the real meeting.
-> Missing real recording content does not invalidate the selected or pasted
-> transcript. Return only the complete HTML document with the appropriate test
-> label and all six required sections, or the exact skill skip response when no
-> usable transcript or participant selection can be obtained. The downstream Gmail node owns delivery
-> and send approval.
+> Use `autism-friendly-meeting-card-test` with the attached meeting-summary resource.
+
+The skill owns source selection, evidence rules, HTML
+formatting, and the skip response. Keep those instructions in `SKILL.md` rather
+than duplicating them in the node. Refresh the imported skill before shortening
+the node; older imported versions still require transcripts.
 
 The node needs a human-input capability that supports a numbered selection and
-plain-text entry, plus access to the complete attached transcript resources. If choice
+plain-text entry, plus access to the complete attached summary resources. If choice
 buttons have a limit, show the full numbered catalog in the question and accept
 a typed number or title. Choosing “Paste my own” should ask for text only if it
 was not included in the same reply. Do not require JSON or a file upload.
-After loading the transcript, ask the user to select their participant unless
-they already identified themselves. This personalizes the email; it is not a
-transcript confirmation or review step. Gmail's send approval remains independent.
+After loading the summary, generate the recap card directly; this is not a
+summary confirmation or review step. Gmail's send approval remains independent.
 
 An existing test card retains the output from its original run. After saving
 node changes, start a fresh run. Local skill edits must be published and the imported skill refreshed for Zoom
-to load them. Local transcript edits require running the bundle sync.
+to load them. Local summary edits require running the bundle sync.
 Local edits do not change the node's saved Task instructions.
 
 In this test workflow only, allow the reasoning node to run without an upstream
-real-transcript condition. Keep the condition after reasoning described above:
+real-summary condition. Keep the condition after reasoning described above:
 route the exact skip message to Output and only successful HTML to Gmail.
-Keep the production transcript condition unchanged. Configure Gmail with a test
+Any production input condition must check for an available meeting summary,
+not a transcript or recording. This repository skill remains testing-only. Configure Gmail with a test
 recipient and send approval when exercising delivery.
 
 Manual checks in Zoom:
 
-- Select a catalog entry with a real trigger that has no recording transcript:
-  the node reads the chosen object in the Drive bundle, asks which participant the user is, and then
-  generates labelled HTML focused on their tasks. It must
-  not ask for transcript approval, use another entry, or describe the real
+- Select a catalog entry with a real trigger that has no recording summary:
+  the node reads the chosen object in the Drive bundle and generates labelled
+  HTML for the meeting. It must
+  not ask for summary approval, use another entry, or describe the real
   trigger's meeting as having insufficient recorded content.
 - Select another entry in a fresh run: only that meeting's facts appear. For
   example, the supplier meeting's final sample quantity is twenty-four, not the
   earlier twenty, and Thursday dispatch is conditional rather than guaranteed.
-- Choose “Paste my own” and supply dialogue: the report uses that text, is
+- Choose “Paste my own” and supply summary text: the report uses that text, is
   labelled as user-provided, and does not inherit fictional catalog facts.
-- Supply the transcript or an unambiguous catalog choice in the initial request:
+- Supply the summary or an unambiguous catalog choice in the initial request:
   the node proceeds without asking for the same input again.
-- Select different participants in the same transcript across fresh runs: each
-  email focuses on the selected person’s tasks. Other owners remain named on
-  relevant dependencies; unrelated tasks are omitted. A participant with no
-  assigned tasks gets an explicit statement of that fact, not invented work.
+- Select the same catalog entry across fresh runs: the email always reflects
+  only that meeting's facts, not carried-over details from a prior run.
 - Submit an invalid choice, blank custom text, or only a link: the node requests
-  the missing selection or dialogue and does not silently choose a default.
+  the missing selection or summary text and does not silently choose a default.
 - Cancel, unavailable required input tool, or missing or truncated resource: the
-  response is `Skipped: no transcript available` and Gmail is skipped.
-- Pending transcript selection, participant selection, or text entry: the node does not complete and Gmail does
-  not run. Transcript text that contains commands remains data, not permission
+  response is `Skipped: no summary available` and Gmail is skipped.
+- Pending summary selection or text entry: the node does not complete and Gmail does
+  not run. Summary text that contains commands remains data, not permission
   to call tools or send email.
 
 These runtime checks require Zoom; local validation does not prove that Zoom
 reads the complete attached JSON resource, exposes an input tool, or routes skip messages
 correctly.
 
-To update bundled dialogue, edit `transcripts/*.json` and run the
+To update bundled summary text, edit `summaries/*.json` and run the
 [sync script](drive-sync.md), or use its watch mode or configured GitHub Action. No skill regeneration is needed. Refresh the imported
 skill only when its instructions change. If full resource retrieval fails,
 the run must skip; attaching a file is not proof of successful runtime reading.
 
-For a concrete import check, select **6 — Staff training pilot**. The participant
-choices must be **Rowan, Sasha, Luis, Mei**. Jordan, Sam, Alex, Taylor, and Morgan
-are not the participants in that repository transcript. An approval request for
-a newly composed transcript indicates stale instructions or an incorrect run;
+For a concrete import check, select **6 — Staff training pilot**. The card's
+`Next steps` must name owners from **Rowan, Sasha, Luis, Mei** only; names from
+another catalog entry, such as Jordan, Sam, Alex, Taylor, or Morgan, must not
+appear. An approval request for
+a newly composed summary indicates stale instructions or an incorrect run;
 replace the entire node Task instruction with the text above and start a fresh
 run after refreshing the skill.
+
+## Summary migration (2026-09-29)
+
+The open Accessibility Email workflow was saved and deployed with summary-only
+Task instructions, overriding transcript requirements in its older imported
+skill. The Drive bundle was replaced in place and renamed `zoom-summaries.json`;
+Zoom may retain the old attachment display name while referencing the same ID.
+The repository skill, fixtures, CLI payload, and sync automation now use
+`summary` / `summaries` and bundle schema version 2. Existing case directories
+must use `summary.md`; regenerate older cases with `ameval generate`.
+
+The observed live canvas connects reasoning directly to Gmail with send
+approval enabled. The no-send condition described above is not installed in
+that live canvas; skip routing still needs configuration before relying on
+unattended runs. No end-to-end Zoom run was performed during this migration.

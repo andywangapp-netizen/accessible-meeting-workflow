@@ -1,0 +1,13 @@
+{
+  "id": "09_podcast_edit",
+  "title": "Podcast episode edit review",
+  "simulated": true,
+  "scenario": "A small audio team reviews an episode cut, preserves a correction, and leaves the publication date and title undecided.",
+  "participants": [
+    "Bea",
+    "Arun",
+    "Mina",
+    "Joel"
+  ],
+  "summary": "The podcast team reviewed the rough cut of a community-history episode. The main editorial question was how to present the guest's correction of the station opening year from 1984 to 1986. Arun would prepare two short versions so Bea could choose the clearer approach before the next full edit. The team wanted the correction to be apparent without suggesting that the historical date had been independently verified.\n\nThey also discussed music licensing, speaker labels in the episode transcript, and the accuracy of an archive link in the show notes. Joel would check the music and notes and suggest alternative titles. Mina would align the text with the revised audio. A Friday release remained a possibility, but the publication date depended on finishing these checks and edits.\n"
+}
