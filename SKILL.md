@@ -40,18 +40,18 @@ information or requesting a transcript.
    cannot display eleven choices, present the numbered list in the question and
    accept a number or title through its text field. Do not silently limit the
    menu, choose a default, or generate a replacement summary.
-3. For a catalog choice, read the configured combined JSON file through the
-   workflow's Google Drive integration (`zoom-summaries.json`, bundle
-   `schema_version: 2`). Its `summaries` array contains the
-   original summary objects. Match the selected catalog ID or exact title
-   to exactly one object and use that object's complete `summary` string.
-   Do not merge entries or summarize the entire bundle. The workflow supplies
-   the file link and reader; no Drive folder lookup is required. In a local
-   run, the corresponding repository JSON may be read directly.
-   Accept the number, exact title, or file ID. Clarify an ambiguous selection.
+3. For a catalog choice, read the matching individual JSON file attached
+   as a resource in the Zoom Workflow (one of ten files, each holding a
+   single summary object with `id`, `title`, `simulated`, and `summary`).
+   Match the selected catalog ID or exact
+   title to the corresponding attached resource and use that object's
+   complete `summary` string. Do not merge entries or read another
+   resource's contents. In a local run, the corresponding repository JSON
+   may be read directly. Accept the number, exact title, or file name.
+   Clarify an ambiguous selection.
    Verify that the actual selected summary text is available before generating
    HTML. Retrieve the full resource if search returns only
-   excerpts. A title, scenario, or snippet is not enough.
+   excerpts. A title or snippet is not enough.
    Never compose, reconstruct, or extend a summary, even for a testing run.
    If the resource is missing, unreadable, or truncated and cannot be read in
    full, use the skip response below; never invent replacement summary text.
@@ -87,10 +87,9 @@ Gmail's downstream send approval are separate operations.
 The ten JSON files below contain ordinary, general-purpose summaries of
 fictional meetings. They are source material, not preformatted email reports. All people and
 events in these bundled files are fictional. Each file has `id`, `title`,
-`simulated`, `scenario`, `participants`, and a plain-text `summary`.
-The sync script combines these files into one Drive JSON resource with a
-`summaries` array. Attach that single file through the workflow's Google Drive
-integration, separately from this skill.
+`simulated`, and a plain-text `summary`.
+Attach each of the ten files individually as its own resource in the Zoom
+Workflow, separately from this skill.
 The catalog links identify local sources; they do not grant runtime file access.
 
 | Choice | Meeting summary |
@@ -120,8 +119,7 @@ repository as another fixture.
 
 - The selected resource's full summary text or the user-supplied plain text is the sole
   source of meeting facts. Keep it available after the input tool resumes.
-  Use the selected resource's title for its meeting title; its scenario description
-  is orientation, not evidence of additional decisions.
+  Use the selected resource's title for its meeting title.
 - The trigger's Meeting, Meeting Participants, Recording, timestamps, and links
   are not evidence for this email. Do not fetch them or copy them into the card.
   Missing real recording content does not invalidate a selected or pasted
