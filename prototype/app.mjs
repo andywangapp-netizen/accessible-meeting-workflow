@@ -2,7 +2,7 @@ import {
   parseTranscript,
   participants,
   makeSession,
-  generateTranscript,
+  summaryToTranscript,
   stuckOptions,
   practiceOptions,
 } from "./coach.mjs";
@@ -21,6 +21,11 @@ const state = {
   checks: {},
   plan: [],
   nextId: 1,
+  chat: [],
+  chatBusy: false,
+  chatDraft: "",
+  chatError: "",
+  chatAvailable: null,
 };
 const escape = (value) =>
   String(value).replace(
@@ -39,13 +44,13 @@ function announce(message) {
 function dirty() {
   return (
     state.session &&
-    (state.session.text !== $("#transcript").value ||
+    (state.session.text !== toTranscript() ||
       state.session.person !== $("#person").value)
   );
 }
 function updateSourceStatus() {
   $("#source-status").textContent = dirty()
-    ? `Changes pending. Coaching still uses the previous transcript for ${state.session.person}. Opening the updated space starts a new plan.`
+    ? `Changes pending. Coaching still uses the previous summary for ${state.session.person}. Opening the updated space starts a new plan.`
     : state.session
       ? `Your active coaching session is for ${state.session.person}.`
       : "";
@@ -54,28 +59,46 @@ function updateSourceStatus() {
     : 'Open my coaching space <span aria-hidden="true">→</span>';
 }
 function syncParticipants(preferred = $("#person").value) {
-  const names = participants(parseTranscript($("#transcript").value));
+  const names = participants(parseTranscript(toTranscript()));
   $("#person").replaceChildren(new Option("Choose your name", ""));
   for (const name of names) $("#person").add(new Option(name, name));
   if (names.includes(preferred)) $("#person").value = preferred;
   updateSourceStatus();
 }
+let summaries = [];
 function setMode(mode) {
+  $("#library").hidden = mode !== "library";
   $("#generator").hidden = mode !== "generate";
-  $("#paste-mode").setAttribute("aria-pressed", String(mode === "paste"));
+  $("#library-mode").setAttribute("aria-pressed", String(mode === "library"));
   $("#generate-mode").setAttribute("aria-pressed", String(mode === "generate"));
 }
-function loadExample() {
-  $("#transcript").value = generateTranscript();
-  syncParticipants("Alex");
+async function loadLibrary() {
+  const select = $("#summary-select");
+  try {
+    const response = await fetch("/api/summaries");
+    if (!response.ok) throw new Error();
+    summaries = await response.json();
+    select.replaceChildren(new Option("Choose a meeting", ""));
+    for (const item of summaries) select.add(new Option(item.title, item.id));
+  } catch {
+    select.replaceChildren(new Option("Unavailable", ""));
+    $("#library-error").textContent =
+      "Could not load the simulated meetings. Start the app with node prototype/server.mjs.";
+  }
+}
+function toTranscript() {
+  return summaryToTranscript($("#summary").value);
+}
+function showSummary(summary) {
+  $("#session-form").hidden = false;
+  $("#summary").value = summary;
+  syncParticipants(participants(parseTranscript(toTranscript()))[0]);
   $("#session-error").textContent = "";
-  announce(
-    "Fictional example loaded. Alex is selected as the person to coach.",
-  );
 }
 function navigate(view, focus = true) {
   state.view = view;
-  render();
+  loadLibrary();
+render();
   if (focus) {
     const heading = content.querySelector("h3");
     if (heading) {
@@ -95,7 +118,7 @@ function render() {
   }
   $("#plan-count").textContent = state.plan.length;
   if (!state.session) {
-    content.innerHTML = `<div class="welcome"><p class="eyebrow">A PLACE TO PRACTICE, NOT PERFORM</p><h3>What would make your<br>next meeting easier?</h3><p>Start with a transcript and choose yourself. Then explore a difficult moment or practice something you want to say.</p><ol class="welcome-steps"><li><span>1</span> Enter a fictional meeting or make a scenario.</li><li><span>2</span> Choose the person you want to be.</li><li><span>3</span> Open your personal coaching space.</li></ol></div><div class="feature-grid"><div class="feature-card"><span class="feature-icon" aria-hidden="true">≋</span><h3>A way through “I’m stuck”</h3><p>Find a phrase for asking, pausing, or sharing a different view.</p></div><div class="feature-card"><span class="feature-icon" aria-hidden="true">↗</span><h3>Practice with a purpose</h3><p>Try wording that supports your goal. Keep what works for you.</p></div></div>`;
+    content.innerHTML = `<div class="welcome"><p class="eyebrow">A PLACE TO PRACTICE, NOT PERFORM</p><h3>What would make your<br>next meeting easier?</h3><p>Start with a meeting summary and choose yourself. Then explore a difficult moment or practice something you want to say.</p><ol class="welcome-steps"><li><span>1</span> Choose a simulated meeting, or generate a new one with AI.</li><li><span>2</span> Choose the person you want to be.</li><li><span>3</span> Open your personal coaching space.</li></ol></div><div class="feature-grid"><div class="feature-card"><span class="feature-icon" aria-hidden="true">≋</span><h3>A way through “I’m stuck”</h3><p>Find a phrase for asking, pausing, or sharing a different view.</p></div><div class="feature-card"><span class="feature-icon" aria-hidden="true">↗</span><h3>Practice with a purpose</h3><p>Try wording that supports your goal. Keep what works for you.</p></div></div>`;
     return;
   }
   const person = state.session.person;
@@ -106,6 +129,7 @@ function render() {
   if (state.view === "summary") renderSummary();
   if (state.view === "stuck") renderStuck();
   if (state.view === "practice") renderPractice();
+  if (state.view === "chat") renderChat();
   if (state.view === "plan") renderPlan();
 }
 function renderSummary() {
@@ -117,8 +141,63 @@ function renderSummary() {
     .slice(-3)
     .map((turn) => `<li>${quote(turn, true)}</li>`)
     .join("")}</ul></section>
-  ${questions.length ? `<section class="content-card"><h3>Questions to revisit</h3><p class="hint">These were asked in the meeting. Check the transcript to see whether they were answered.</p><ul class="quote-list">${questions.map((turn) => `<li>${quote(turn, turn.speaker === person)}</li>`).join("")}</ul></section>` : ""}
+  ${questions.length ? `<section class="content-card"><h3>Questions to revisit</h3><p class="hint">These were asked in the meeting. Check the summary to see whether they were answered.</p><ul class="quote-list">${questions.map((turn) => `<li>${quote(turn, turn.speaker === person)}</li>`).join("")}</ul></section>` : ""}
   <div class="feature-grid"><button class="feature-card" data-go="stuck"><span class="feature-icon" aria-hidden="true">≋</span><h3>I’m stuck</h3><p>Help me find a next step or the words to use.</p></button><button class="feature-card" data-go="practice"><span class="feature-icon" aria-hidden="true">↗</span><h3>I want to work on…</h3><p>Give me a focused exercise to try.</p></button></div>`;
+}
+function renderChat() {
+  const person = state.session.person;
+  const messages = state.chat
+    .map(
+      (m) =>
+        `<li class="chat-message ${m.role}"><strong>${m.role === "user" ? "You" : "Coach"}</strong><p>${escape(m.content)}</p></li>`,
+    )
+    .join("");
+  const unavailable = state.chatAvailable === false;
+  content.innerHTML = `<section class="content-card"><p class="eyebrow">AI CHAT</p><h3>Talk it through with the coach.</h3><p class="intro-text">Ask for help preparing, wording something, or making sense of a moment. The coach only helps ${escape(person)}.</p><p class="hint"><strong>Privacy:</strong> your messages and this fictional meeting summary are sent to the OpenAI API. Do not enter real personal or confidential information. The AI can be wrong; check it against the summary.</p>${unavailable ? '<p class="error" role="alert">Chat is not set up. Add OPENAI_API_KEY to .env and start the app with <code>node prototype/server.mjs</code>.</p>' : ""}<ol class="chat-log" id="chat-log" aria-label="Conversation">${messages}</ol><p class="hint" id="chat-status" role="status">${state.chatBusy ? "The coach is replying…" : ""}</p><p class="error" role="alert">${escape(state.chatError)}</p><form id="chat-form"><label for="chat-input">Your message</label><textarea id="chat-input" rows="3" maxlength="2000" ${unavailable ? "disabled" : ""}>${escape(state.chatDraft)}</textarea><div class="button-row"><button class="button primary" type="submit" ${unavailable || state.chatBusy ? "disabled" : ""}>Send</button><button class="button secondary" type="button" data-action="clear-chat" ${state.chat.length ? "" : "disabled"}>Clear chat</button></div></form></section>`;
+  if (state.chatAvailable === null) checkChat();
+}
+async function checkChat() {
+  try {
+    state.chatAvailable = (await (await fetch("/api/status")).json()).chat;
+  } catch {
+    state.chatAvailable = false;
+  }
+  if (state.view === "chat") renderChat();
+}
+async function sendChat(text) {
+  state.chat.push({ role: "user", content: text });
+  state.chatDraft = "";
+  state.chatError = "";
+  state.chatBusy = true;
+  const session = state.session;
+  renderChat();
+  $("#chat-input").focus({ preventScroll: true });
+  try {
+    const response = await fetch("/api/chat", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        transcript: session.text,
+        person: session.person,
+        messages: state.chat.slice(-20),
+      }),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || "Chat failed.");
+    if (state.session !== session) return;
+    state.chat.push({ role: "assistant", content: data.reply });
+    announce(`Coach replied: ${data.reply}`);
+  } catch (error) {
+    if (state.session !== session) return;
+    state.chatError = `${error.message} Your message is kept so you can try again.`;
+    state.chatDraft = text;
+    state.chat.pop();
+  }
+  state.chatBusy = false;
+  if (state.view === "chat") {
+    renderChat();
+    $("#chat-log").lastElementChild?.scrollIntoView({ block: "nearest" });
+  }
 }
 function momentPicker() {
   return `<div class="context-select"><label for="moment">A moment from your meeting (optional)</label><select id="moment"><option value="">Work on this generally</option>${state.session.turns.map((turn) => `<option value="${turn.id}" ${String(turn.id) === state.moment ? "selected" : ""}>${escape(turn.speaker)}: ${escape(turn.text.length > 95 ? `${turn.text.slice(0, 95)}…` : turn.text)}</option>`).join("")}</select></div><div id="selected-moment">${selectedMoment()}</div>`;
@@ -214,38 +293,46 @@ async function copyText(text, statusId) {
   }
 }
 
-$("#paste-mode").addEventListener("click", () => setMode("paste"));
-$("#generate-mode").addEventListener("click", () => setMode("generate"));
-$("#load-example").addEventListener("click", loadExample);
-$("#transcript").addEventListener("input", () => {
+$("#summary").addEventListener("input", () => {
   syncParticipants();
   $("#session-error").textContent = "";
 });
 $("#person").addEventListener("change", updateSourceStatus);
-$("#generator").addEventListener("submit", (event) => {
+$("#library-mode").addEventListener("click", () => setMode("library"));
+$("#generate-mode").addEventListener("click", () => setMode("generate"));
+$("#summary-select").addEventListener("change", (event) => {
+  const meeting = summaries.find((item) => item.id === event.target.value);
+  if (!meeting) return;
+  showSummary(meeting.summary);
+  announce(`${meeting.title} loaded. Choose which participant you are.`);
+});
+$("#generator").addEventListener("submit", async (event) => {
   event.preventDefault();
+  const button = $("#generate-button");
+  button.disabled = true;
+  $("#generator-error").textContent = "";
+  announce("Generating a meeting summary…");
   try {
-    const name = $("#generated-name").value.trim();
-    $("#transcript").value = generateTranscript({
-      name,
-      setting: $("#setting").value,
-      challenge: $("#challenge").value,
-      length: document.querySelector("[name=length]:checked").value,
+    const response = await fetch("/api/generate-summary", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ description: $("#meeting-description").value }),
     });
-    syncParticipants(name);
-    $("#generator-error").textContent = "";
-    $("#session-error").textContent = "";
-    announce(
-      `Fictional transcript generated with ${name} selected. Open the coaching space when ready.`,
-    );
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || "Generation failed.");
+    showSummary(data.summary);
+    announce(`${data.title} generated. Choose which participant you are.`);
+    $("#person").focus();
   } catch (error) {
     $("#generator-error").textContent = error.message;
+  } finally {
+    button.disabled = false;
   }
 });
 $("#session-form").addEventListener("submit", (event) => {
   event.preventDefault();
   try {
-    const session = makeSession($("#transcript").value, $("#person").value);
+    const session = makeSession(toTranscript(), $("#person").value);
     if (!state.session || dirty()) {
       state.session = session;
       state.plan = [];
@@ -256,6 +343,9 @@ $("#session-form").addEventListener("submit", (event) => {
       state.tone = "direct";
       state.stuck = "clarity";
       state.goal = "clarity";
+      state.chat = [];
+      state.chatDraft = "";
+      state.chatError = "";
     }
     $("#session-error").textContent = "";
     updateSourceStatus();
@@ -269,7 +359,14 @@ $(".coach-nav").addEventListener("click", (event) => {
   const button = event.target.closest("[data-view]");
   if (button && !button.disabled) navigate(button.dataset.view);
 });
+content.addEventListener("submit", (event) => {
+  if (event.target.id !== "chat-form") return;
+  event.preventDefault();
+  const text = $("#chat-input").value.trim();
+  if (text && !state.chatBusy) sendChat(text);
+});
 content.addEventListener("input", (event) => {
+  if (event.target.id === "chat-input") state.chatDraft = event.target.value;
   if (event.target.id === "script")
     state.scripts[scriptKey()] = event.target.value;
   if (event.target.id === "practice-draft")
@@ -295,7 +392,8 @@ content.addEventListener("click", (event) => {
   ]) {
     if (button.dataset[attribute]) {
       state[field] = button.dataset[attribute];
-      render();
+      loadLibrary();
+render();
       content
         .querySelector(`[data-${attribute}="${state[field]}"]`)
         .focus({ preventScroll: true });
@@ -305,12 +403,19 @@ content.addEventListener("click", (event) => {
     state.plan = state.plan.filter(
       (item) => item.id !== Number(button.dataset.remove),
     );
-    render();
+    loadLibrary();
+render();
     const next = content.querySelector("[data-remove], [data-go]");
     if (next) next.focus({ preventScroll: true });
     announce("Item removed from your plan.");
   }
   const action = button.dataset.action;
+  if (action === "clear-chat") {
+    state.chat = [];
+    state.chatError = "";
+    renderChat();
+    announce("Chat cleared.");
+  }
   if (action === "save-script") {
     const turn = state.session.turns.find(
       (turn) => String(turn.id) === state.moment,
@@ -338,5 +443,5 @@ content.addEventListener("click", (event) => {
     );
 });
 
-loadExample();
+loadLibrary();
 render();

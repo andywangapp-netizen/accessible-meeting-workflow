@@ -11,10 +11,10 @@ This is a **small public harness**. There are no real customer accounts, hidden 
 
 ## Local coaching website prototype
 
-The `test-features` branch also includes a structured, single-person coaching website in [`prototype/`](prototype/README.md). Enter a fictional transcript or generate a scenario, select yourself, and explore **I’m stuck**, guided practice, and a personal plan. It needs no Zoom access or API credentials.
+The `test-features` branch also includes a structured, single-person coaching website in [`prototype/`](prototype/README.md). Choose a simulated meeting summary or generate one with AI, select yourself, and explore **I’m stuck**, guided practice, and a personal plan. It needs no Zoom access; the optional AI features need an OpenAI API key.
 
 ```bash
-python3 -m http.server 4173 --bind 127.0.0.1 --directory prototype
+node prototype/server.mjs
 ```
 
 Open http://127.0.0.1:4173. The prototype uses scripted coaching and excerpt-based recaps; it is separate from the production email workflow below.

@@ -62,68 +62,53 @@
               <h2 id="setup-heading">Your meeting</h2>
             </div>
           </div>
-          <div class="segmented" role="group" aria-label="Transcript source">
-            <button id="paste-mode" type="button" aria-pressed="true">
-              Enter transcript</button
+          <div class="segmented" role="group" aria-label="Meeting source">
+            <button id="library-mode" type="button" aria-pressed="true">
+              Choose a meeting</button
             ><button id="generate-mode" type="button" aria-pressed="false">
-              Make a scenario
+              Generate with AI
             </button>
           </div>
+          <div id="library">
+            <label for="summary-select">Simulated meeting</label
+            ><select id="summary-select" aria-describedby="library-help">
+              <option value="">Loading meetings…</option>
+            </select>
+            <p class="hint" id="library-help">
+              Ten simulated meeting summaries that ship with this project.
+            </p>
+            <p id="library-error" class="error" role="alert"></p>
+          </div>
           <form id="generator" hidden>
-            <label for="generated-name">Your character’s name</label
-            ><input
-              id="generated-name"
-              value="Alex"
-              maxlength="50"
-              required
-              autocomplete="off"
-            />
-            <label for="setting">Meeting setting</label
-            ><select id="setting">
-              <option value="work">Work project</option>
-              <option value="study">Study group</option>
-              <option value="community">Community planning</option>
-            </select>
-            <label for="challenge">A moment to practice</label
-            ><select id="challenge">
-              <option value="clarity">An unclear assignment</option>
-              <option value="capacity">Too many tasks</option>
-              <option value="speaking">Finding a turn to speak</option>
-            </select>
-            <fieldset>
-              <legend>Conversation length</legend>
-              <div class="radio-row">
-                <label
-                  ><input type="radio" name="length" value="short" checked />
-                  Short</label
-                ><label
-                  ><input type="radio" name="length" value="long" /> More
-                  context</label
-                >
-              </div>
-            </fieldset>
-            <button class="button secondary full" type="submit">
-              Generate fictional transcript <span aria-hidden="true">↗</span>
+            <label for="meeting-description">Describe a meeting</label
+            ><textarea
+              id="meeting-description"
+              rows="3"
+              maxlength="500"
+              aria-describedby="description-help"
+            ></textarea>
+            <p class="hint" id="description-help">
+              Optional. Say what the meeting was about, or leave this empty
+              for a surprise. The AI writes a new fictional meeting summary.
+            </p>
+            <button class="button primary full" type="submit" id="generate-button">
+              Generate meeting summary <span aria-hidden="true">↗</span>
             </button>
             <p id="generator-error" class="error" role="alert"></p>
           </form>
-          <form id="session-form">
-            <div class="label-row">
-              <label for="transcript">Fictional transcript</label
-              ><button class="text-button" id="load-example" type="button">
-                Load example
-              </button>
-            </div>
+          <form id="session-form" hidden>
+            <label for="summary">Meeting summary</label>
             <textarea
-              id="transcript"
+              id="summary"
               rows="11"
               maxlength="30000"
               spellcheck="false"
-              aria-describedby="transcript-help"
+              aria-describedby="summary-help"
               required
             ></textarea>
-            <p class="hint" id="transcript-help">
-              Use “Name: what they said” on each line. Fictional meetings only.
+            <p class="hint" id="summary-help">
+              You can edit this summary. Keep the format: [00:00-00:30] Topic —
+              Participant A asks…; Participant B agrees…
             </p>
             <label for="person">Which person are you?</label
             ><select
@@ -132,7 +117,7 @@
               required
             ></select>
             <p class="hint" id="person-help">
-              All coaching is for this person only. Other speakers provide
+              All coaching is for this person only. Other participants provide
               context.
             </p>
             <p id="session-error" class="error" role="alert"></p>
@@ -144,8 +129,9 @@
           <div class="local-note">
             <span aria-hidden="true">ⓘ</span>
             <p>
-              Demo mode: scripted scenarios, transcript excerpts, and guided
-              exercises. No AI interpretation or Zoom connection.
+              Summary excerpts and guided exercises run in your browser. “Generate
+              with AI” and “Chat with AI” send your text and the meeting
+              summary to the OpenAI API. No Zoom connection.
             </p>
           </div>
         </section>
@@ -165,6 +151,8 @@
             ><button type="button" data-view="stuck">I’m stuck</button
             ><button type="button" data-view="practice">
               I want to work on…</button
+            ><button type="button" data-view="chat">
+              Chat with AI</button
             ><button type="button" data-view="plan">
               My plan <span id="plan-count">0</span>
             </button>
