@@ -2,7 +2,7 @@
 
 Public intern project for **Accessible Meeting Coach**.
 
-After a fictional meeting, one autism-friendly skill turns the transcript into
+After a fictional meeting, one autism-friendly skill turns the summary into
 a calm, predictable, standalone HTML coach report with a presenting outline.
 This repo scores that deep-reasoning skill. Email is the first
 delivery slot; this harness never sends it.
@@ -21,7 +21,7 @@ Open http://127.0.0.1:4173. The prototype uses scripted coaching and excerpt-bas
 
 ## Two jobs
 
-1. **Generate a synthetic meeting transcript** and pack it for a public Zoom Workflow / Codex plugin run.
+1. **Generate a synthetic meeting summary** and pack it for a public Zoom Workflow / Codex plugin run.
 2. **Evaluate deep reasoning** by passing a skill by hand (`--skill`) and scoring the report (sections, safety, invented facts).
 
 You do **not** need Zoom login for offline scoring. Live production-shaped runs use **your public Zoom account** in Chrome.
@@ -89,7 +89,7 @@ pytest -q
 | Command | What it does |
 |---|---|
 | `ameval generate --list` | List synthetic meeting templates |
-| `ameval generate --template <id> --out <dir>` | Write `transcript.md`, `request.txt`, `facts.json` |
+| `ameval generate --template <id> --out <dir>` | Write `summary.md`, `request.txt`, `facts.json` |
 | `ameval evaluate --skill <pack> --case <dir> --output <html>` | Score a deep-reasoning HTML report |
 | `ameval pack-payload --skill <pack> --case <dir> --out <json>` | Write JSON to paste into a plugin (no hidden fields) |
 | `ameval send-payload --payload <json>` | POST that JSON only if you set a local endpoint |
@@ -129,37 +129,39 @@ ameval evaluate --skill . --case cases/frozen/classroom_support --output path/to
 
 ## Attach from GitHub to a DP node
 
-This repository contains two skills:
+The root `SKILL.md` currently contains the testing-only
+`autism-friendly-meeting-card-test` skill, with ten concise fictional meeting
+summaries in `summaries/`. Attach the ten JSON files individually as resources
+for the reasoning node; summary text is not embedded in the skill.
+It is not a production meeting summarizer.
 
-- `SKILL.md`: production meeting follow-up email generation.
-- `skills/autism-friendly-meeting-card-test/SKILL.md`: testing-only simulated
-  transcript review through HITL, followed by email body generation.
-
-The production entry point remains at the root for the existing import and
-evaluation workflow. The test variant uses the conventional `skills/<name>/`
-layout. Discovery of both entries still needs verification in Zoom Workflow;
-its scanner's handling of a root skill alongside nested skills is unconfirmed.
-
-1. Open the deep-reasoning node and expand **Skills**.
+1. Open the AI reasoning node and expand **Skills**.
 2. Select **+**, then **GitHub repo**.
 3. Enter `andywangapp-netizen/accessible-meeting-workflow` and select **Scan**.
-4. For production, attach `autism-friendly-meeting-card`. For a testing run,
-   select `autism-friendly-meeting-card-test` if the scanner lists it. Attach
-   only the intended variant to a node.
+4. Attach `autism-friendly-meeting-card-test`.
+5. Attach each JSON file in `summaries/` as its own resource.
+6. Configure the node to offer the ten summary choices or accept pasted text,
+   following [test setup](docs/public-run.md#testing-without-a-real-meeting-summary).
+   Remove old Meeting and Meeting Participants variable chips and the instruction
+   to summarize the exact trigger meeting. Remove Zoom Meetings lookup tools
+   from this test node.
 
-Repository scans read GitHub, not local edits. Publish layout changes before
-rescanning. If the test skill is still absent, inspect the scanner's supported
-folder layouts before changing the working production entry point.
+Repository scans read GitHub, not local edits. Publish skill changes and refresh
+the imported skill before expecting Zoom to use them. Changing the node prompt
+in Zoom takes effect independently of publishing the repository. Existing run
+cards retain their original output; start a fresh test to check a draft change.
 
-The workflow supplies meeting input. The downstream Gmail node owns recipients,
-subject, approval, and delivery. See [test setup](docs/public-run.md#testing-without-a-real-meeting-transcript)
-for the test variant's HITL and skip routing requirements.
+The downstream Gmail node owns recipients, subject, approval, and delivery.
+After summary selection or pasting, the skill generates the recap card
+directly, without a separate summary-approval question. See test setup for
+input and skip routing requirements. The two short CLI evaluation cases
+remain separate from this ten-meeting selection catalog.
 
 ## Production-shaped run (your public Zoom)
 
 Use this when you want to exercise a real **deep-reasoning** node end-to-end.
 
-1. Generate a synthetic transcript (`ameval generate …`).
+1. Generate a synthetic summary (`ameval generate …`).
 2. Sign in to **public Zoom** (`zoom.us`) in Chrome **yourself**. Do not put a password, cookie, or JWT in this repo.
 3. Codex or Coworker may drive Chrome (**Computer Use** or a Chrome helper) **after** you are logged in. If a login wall appears, stop automation and finish login yourself.
 4. In the Zoom Workflow plugin, attach the root `SKILL.md`, run the deep-reasoning node, and save the visible HTML card to `runs/<id>/output.html` (`runs/` is gitignored).
@@ -190,8 +192,8 @@ More detail: [docs/public-run.md](docs/public-run.md), [docs/chrome-auth.md](doc
 ```text
 README.md                 This file
 ETHICS.md                 Data and language rules
-SKILL.md                  Production autism-friendly card skill
-skills/                   Separately selectable testing skill
+SKILL.md                  Testing-only skill with summary resource selection
+summaries/              Ten concise simulated meeting JSON files
 schema.json               Deterministic HTML output contract
 rubric.md / forbidden.md  Public evaluation and respectful-language rules
 cases/frozen/             Checked-in synthetic meetings
@@ -204,7 +206,7 @@ tests/                    Offline scorer tests
 
 ## Must-have vs later
 
-**Must-have:** template-shaped transcript → hand-passed HTML skill → score the deep-reasoning output. Email is the delivery slot in the schema.
+**Must-have:** template-shaped summary → hand-passed HTML skill → score the deep-reasoning output. Email is the delivery slot in the schema.
 
 **Out of scope:** additional disability packs, Zoom Team Chat, phone / voice, and production connectors. Keep the public surface small; do not add hidden metadata to make scores look better.
 

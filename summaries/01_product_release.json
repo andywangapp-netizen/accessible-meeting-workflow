@@ -1,0 +1,6 @@
+{
+  "id": "01_product_release",
+  "title": "Product release readiness",
+  "simulated": true,
+  "summary": "[00:00-00:28] Beta readiness — Participant A asks about readiness for the invite-only beta; Participant B confirms that account creation and password reset are working • [00:28-01:14] Export issue — Participant B reports that exports are corrupting some accented names; Participant C explains that several volunteer teams need to download reports, and Participant A puts invitations on hold until the issue is fixed and checked • [01:14-02:02] Fix & testing — Participant B expects to finish the code Wednesday afternoon and provide a test build Thursday at noon; Participant C says testing could follow later Thursday or Friday morning, depending on availability • [02:02-02:46] Dashboard performance — Participant C raises slow dashboard loading on larger workspaces; Participant A agrees that the team will collect performance feedback during the beta • [02:46-03:20] Volunteer update — Participant C will update the volunteer teams while Participant A prepares invitation drafts • [03:20-03:52] Launch wording — Participant A removes wording suggesting a public release next month and confirms that no launch date has been agreed"
+}
