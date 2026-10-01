@@ -74,10 +74,9 @@ Pass the skill **manually** (`--skill .`). Do not ask the model to invent a disa
 ## Testing without a real meeting summary
 
 Use the root [testing skill](../SKILL.md) in a test workflow. Keep summary text
-separate from the skill: select the single `zoom-summaries.json` file using
-the reasoning node's Google Drive integration. See [Drive sync](drive-sync.md)
-for the file link, bundle format, and automated update setup. Do not select a
-folder or keep stale direct-upload copies as the source.
+separate from the skill: attach each of the ten JSON files in `summaries/`
+as its own resource in the reasoning node. Replace attached copies when their
+source files change.
 
 The ten JSON files provide complete simulated meetings. The two short
 `ameval generate` evaluation cases are independent of this catalog.
@@ -106,7 +105,7 @@ summary confirmation or review step. Gmail's send approval remains independent.
 
 An existing test card retains the output from its original run. After saving
 node changes, start a fresh run. Local skill edits must be published and the imported skill refreshed for Zoom
-to load them. Local summary edits require running the bundle sync.
+to load them. Local summary edits require replacing the corresponding attached resources.
 Local edits do not change the node's saved Task instructions.
 
 In this test workflow only, allow the reasoning node to run without an upstream
@@ -119,7 +118,7 @@ recipient and send approval when exercising delivery.
 Manual checks in Zoom:
 
 - Select a catalog entry with a real trigger that has no recording summary:
-  the node reads the chosen object in the Drive bundle, asks which participant the user is, and then
+  the node reads the chosen summary resource, asks which participant the user is, and then
   generates labelled HTML focused on their tasks. It must
   not ask for summary approval, use another entry, or describe the real
   trigger's meeting as having insufficient recorded content.
@@ -146,29 +145,21 @@ These runtime checks require Zoom; local validation does not prove that Zoom
 reads the complete attached JSON resource, exposes an input tool, or routes skip messages
 correctly.
 
-To update bundled summary text, edit `summaries/*.json` and run the
-[sync script](drive-sync.md), or use its watch mode or configured GitHub Action. No skill regeneration is needed. Refresh the imported
+To update bundled summary text, edit `summaries/*.json` and replace the
+corresponding attached resources. No skill regeneration is needed. Refresh the imported
 skill only when its instructions change. If full resource retrieval fails,
 the run must skip; attaching a file is not proof of successful runtime reading.
 
 For a concrete import check, select **6 — Staff training pilot**. The participant
-choices must be **Rowan, Sasha, Luis, Mei**. Jordan, Sam, Alex, Taylor, and Morgan
-are not the participants in that repository summary. An approval request for
+choices must be **Participant A, Participant B, Participant C**, matching the
+labels in that summary. An approval request for
 a newly composed summary indicates stale instructions or an incorrect run;
 replace the entire node Task instruction with the text above and start a fresh
 run after refreshing the skill.
 
-## Summary migration (2026-09-29)
+## Local evaluation inputs
 
-The open Accessibility Email workflow was saved and deployed with summary-only
-Task instructions, overriding transcript requirements in its older imported
-skill. The Drive bundle was replaced in place and renamed `zoom-summaries.json`;
-Zoom may retain the old attachment display name while referencing the same ID.
-The repository skill, fixtures, CLI payload, and sync automation now use
-`summary` / `summaries` and bundle schema version 2. Existing case directories
-must use `summary.md`; regenerate older cases with `ameval generate`.
-
-The observed live canvas connects reasoning directly to Gmail with send
-approval enabled. The no-send condition described above is not installed in
-that live canvas; skip routing still needs configuration before relying on
-unattended runs. No end-to-end Zoom run was performed during this migration.
+The summary catalog is separate from the CLI evaluation templates. The current
+CLI generates `transcript.md`, `request.txt`, and `facts.json`, and its payload
+uses `transcript`. These evaluation cases do not replace the summary resources
+attached to the testing workflow.

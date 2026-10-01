@@ -121,20 +121,15 @@ ameval evaluate --skill . --case cases/frozen/classroom_support --output path/to
 
 The root `SKILL.md` currently contains the testing-only
 `autism-friendly-meeting-card-test` skill, with ten concise fictional meeting
-summaries in `summaries/`. The sync script combines them into one Drive JSON
-file for the reasoning node; summary text is not embedded in the skill.
+summaries in `summaries/`. Attach the ten JSON files individually as resources
+for the reasoning node; summary text is not embedded in the skill.
 It is not a production meeting summarizer.
-
-For updates to the Drive copies, use the [automatic summary sync](docs/drive-sync.md).
-It supports local watch mode and a GitHub Actions workflow for changes pushed
-to `main`, updating the single combined Drive file in place.
 
 1. Open the AI reasoning node and expand **Skills**.
 2. Select **+**, then **GitHub repo**.
 3. Enter `andywangapp-netizen/accessible-meeting-workflow` and select **Scan**.
 4. Attach `autism-friendly-meeting-card-test`.
-5. Under **Resources → Google Drive**, select `zoom-summaries.json`; see
-   [Drive sync setup](docs/drive-sync.md) for the file link.
+5. Attach each JSON file in `summaries/` as its own resource.
 6. Configure the node to offer the ten summary choices or accept pasted text,
    following [test setup](docs/public-run.md#testing-without-a-real-meeting-summary).
    Remove old Meeting and Meeting Participants variable chips and the instruction

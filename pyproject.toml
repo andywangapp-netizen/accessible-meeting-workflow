@@ -10,7 +10,6 @@ dependencies = []
 
 [project.optional-dependencies]
 dev = ["pytest>=8.0"]
-drive-sync = ["google-auth[requests]>=2.38,<3"]
 
 [project.scripts]
 ameval = "ameval.cli:main"
