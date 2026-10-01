@@ -88,6 +88,9 @@ The ten JSON files below contain ordinary, general-purpose summaries of
 fictional meetings. They are source material, not preformatted email reports. All people and
 events in these bundled files are fictional. Each file has `id`, `title`,
 `simulated`, and a plain-text `summary`.
+Each summary uses `[MM:SS-MM:SS] Topic — recap` segments separated by ` • `.
+The timestamp ranges are illustrative elapsed times for the fictional meetings,
+not timings taken from recordings.
 Attach each of the ten files individually as its own resource in the Zoom
 Workflow, separately from this skill.
 The catalog links identify local sources; they do not grant runtime file access.
