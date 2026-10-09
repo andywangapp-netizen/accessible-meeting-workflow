@@ -9,6 +9,16 @@ delivery slot; this harness never sends it.
 
 This is a **small public harness**. There are no real customer accounts, hidden answer keys, or private APIs here.
 
+## Zoom-style AI node tester
+
+The separate [`workflow-tester/`](workflow-tester/README.md) website mirrors a Zoom meeting trigger, AI reasoning node, and output node. It bundles the testing skill and all ten summaries directly, supports searchable skill attachment and template import/export, and displays the generated email as previewable, copyable HTML. No email is sent.
+
+```sh
+node workflow-tester/server.mjs
+```
+
+Open http://127.0.0.1:4174. Real AI uses the existing server-side `OPENAI_API_KEY`; a labelled template dry run needs no key.
+
 ## Local coaching website prototype
 
 The `test-features` branch also includes a structured, single-person coaching website in [`prototype/`](prototype/README.md). Choose a simulated meeting summary or generate one with AI, select yourself, and explore **I’m stuck**, guided practice, and a personal plan. It needs no Zoom access; the optional AI features need an OpenAI API key.

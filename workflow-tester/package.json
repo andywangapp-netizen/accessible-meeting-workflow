@@ -1,0 +1,11 @@
+{
+  "name": "meeting-workflow-node-lab",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs",
+    "build": "bash scripts/build.sh",
+    "test": "node --test engine.test.mjs",
+    "validate": "node scripts/validate-artifact.mjs"
+  }
+}
