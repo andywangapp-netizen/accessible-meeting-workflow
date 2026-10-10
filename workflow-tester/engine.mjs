@@ -1,8 +1,9 @@
+import {createMeetingLink} from '../prototype/meeting-link.mjs';
 export const SKIP = 'Skipped: no summary available';
 export const HEADINGS = ['One-sentence summary', 'What was decided', 'What was not decided', 'Next steps', 'Possible confusion points', 'Presenting outline'];
 export const KEYS = ['overview', 'decisions', 'open', 'steps', 'confusion', 'outline'];
 export const escapeHTML = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-export function renderEmail(source, sections, dryRun = false) {
+export function renderEmail(source, sections, dryRun = false, meetingLink = '') {
   const label = source.simulated ? 'TEST ONLY — Simulated meeting' : 'TEST ONLY — User-provided summary';
   const textStyle = 'font-size:18px;line-height:1.65;color:#243349;';
   const content = HEADINGS.map((heading,i) => {
@@ -10,8 +11,9 @@ export function renderEmail(source, sections, dryRun = false) {
     const body = items.length ? (i === 0 ? `<p style="${textStyle}">${escapeHTML(items[0].text)}</p>` : `<ul style="${textStyle}padding-left:24px;">${items.map(item => `<li style="margin:10px 0;">${escapeHTML(item.text)}</li>`).join('')}</ul>`) : `<p style="${textStyle}">${dryRun ? 'Not classified in this template dry run.' : 'Not stated in the summary.'}</p>`;
     return `<section style="margin-top:30px;"><h2 style="font-size:22px;line-height:1.4;margin:0 0 12px;color:#16263d;">${heading}</h2>${body}</section>`;
   }).join('\n');
+  const coaching = meetingLink ? `<p style="margin-top:30px;"><a href="${escapeHTML(meetingLink)}" target="_blank" rel="noopener noreferrer" style="display:inline-block;background:#175cd3;color:#ffffff;padding:12px 20px;border-radius:6px;font-size:18px;font-weight:bold;text-decoration:underline;">Talk through this meeting with AI</a></p><p style="font-size:14px;color:#475569;">Your meeting details will be loaded automatically. Anyone with this link can view them.</p>` : '';
   return `<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${escapeHTML(source.title)} — Meeting recap</title><style>:focus-visible{outline:3px solid #175cd3;outline-offset:4px}@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}</style></head><body style="margin:0;background:#f3f5f8;font-family:Arial,Helvetica,sans-serif;"><main style="padding:24px 12px;"><article class="meeting-card" aria-labelledby="meeting-card-title" style="max-width:46rem;margin:0 auto;padding:32px;background:#ffffff;color:#243349;font-size:18px;line-height:1.65;"><p style="font-size:14px;color:#475569;margin:0 0 12px;">${label}</p><h1 id="meeting-card-title" style="font-size:28px;line-height:1.35;margin:0 0 16px;">${escapeHTML(source.title)}</h1><p style="${textStyle}">${source.simulated ? 'This report summarizes fictional test data.' : 'This report is a test generated from user-provided text.'}${dryRun ? ' Template dry run: source excerpts only; no AI reasoning was performed.' : ''}</p>${content}</article></main></body></html>`;
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${escapeHTML(source.title)} — Meeting recap</title><style>:focus-visible{outline:3px solid #175cd3;outline-offset:4px}@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}</style></head><body style="margin:0;background:#f3f5f8;font-family:Arial,Helvetica,sans-serif;"><main style="padding:24px 12px;"><article class="meeting-card" aria-labelledby="meeting-card-title" style="max-width:46rem;margin:0 auto;padding:32px;background:#ffffff;color:#243349;font-size:18px;line-height:1.65;"><p style="font-size:14px;color:#475569;margin:0 0 12px;">${label}</p><h1 id="meeting-card-title" style="font-size:28px;line-height:1.35;margin:0 0 16px;">${escapeHTML(source.title)}</h1><p style="${textStyle}">${source.simulated ? 'This report summarizes fictional test data.' : 'This report is a test generated from user-provided text.'}${dryRun ? ' Template dry run: source excerpts only; no AI reasoning was performed.' : ''}</p>${content}${coaching}</article></main></body></html>`;
 }
 export function templateSections(source) {
   const segments = source.summary.split(' • ').map(text => ({text, evidence:text}));
@@ -80,7 +82,9 @@ export async function runNode(body, env, catalog, builtinSkill, fetcher = fetch)
     }
     trace.push({label:'Evidence check',detail:'Every generated item cites an existing source excerpt. This checks reference validity, not semantic correctness; review the preview.'});
   }
-  const response = renderEmail(source,sections,body.mode === 'template');
+  const meetingLink = env.MEETING_WEBSITE_URL ? await createMeetingLink(source,env.MEETING_WEBSITE_URL) : '';
+  const response = renderEmail(source,sections,body.mode === 'template',meetingLink);
+  if (meetingLink) trace.push({label:'Meeting context link',detail:'Added a website link carrying the selected meeting details for AI chat.'});
   trace.push({label:'Condition → HTML output',detail:'Generated six-section standalone HTML. Email delivery replaced by preview; nothing sent.'});
-  return {status:'complete',response,trace,model,mode:body.mode,sourceTitle:source.title};
+  return {status:'complete',response,trace,model,mode:body.mode,sourceTitle:source.title,meetingLink};
 }

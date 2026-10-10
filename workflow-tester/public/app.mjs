@@ -50,6 +50,7 @@ function renderResult(){
   $('log-view').innerHTML=result.trace.map(item=>`<article class="log-item"><strong>${escape(item.label)}</strong><p>${escape(item.detail)}</p></article>`).join('');
   $('result-badge').textContent=result.status==='skipped'?'Skipped':result.mode==='template'?'Dry run':'Complete';
   $('output-note').textContent=result.status==='skipped'?'Skip routed to status · no email':result.mode==='template'?'Template output · no AI called':'HTML ready · nothing sent';
+  $('open-meeting').hidden=!result.meetingLink; if(result.meetingLink)$('open-meeting').href=result.meetingLink;
   $('copy').disabled=false;$('download').disabled=result.status!=='complete';
   for(const node of ['trigger','reasoning','output'])$('state-'+node).textContent=result.status==='skipped'&&node==='reasoning'?'–':'✓';
   message(result.status==='skipped'?result.response:result.mode==='template'?'Template dry run complete. Source excerpts only; no AI reasoning performed.':'AI recap generated. Review decisions and dates against the source.');
@@ -69,7 +70,7 @@ async function run(){
   if(!$('max-actions').checkValidity()){message('Maximum actions must be a whole number from 1 to 20.',true);$('max-actions').focus();return;}
   if(state.mode==='ai'&&!state.ai){message('AI is not configured on this server. Choose Template dry run, or set OPENAI_API_KEY on the server and restart.',true);selectNode('reasoning');return;}
   const body=config();
-  setBusy(true);state.result=null;$('copy').disabled=true;$('download').disabled=true;$('preview').srcdoc='';$('html-view').textContent='';$('log-count').textContent='0';$('log-view').replaceChildren();updateView();$('result-badge').textContent='Running';message('Running the test with the selected skill and summary…');
+  setBusy(true);state.result=null;$('open-meeting').hidden=true;$('copy').disabled=true;$('download').disabled=true;$('preview').srcdoc='';$('html-view').textContent='';$('log-count').textContent='0';$('log-view').replaceChildren();updateView();$('result-badge').textContent='Running';message('Running the test with the selected skill and summary…');
   for(const node of ['trigger','reasoning','output'])$('state-'+node).textContent='';
   try{
     const response=await fetch('/api/run',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body),signal:AbortSignal.timeout(190000)});

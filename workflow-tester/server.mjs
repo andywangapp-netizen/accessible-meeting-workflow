@@ -11,6 +11,7 @@ const catalog = await Promise.all(files.map(async n=>JSON.parse(await readFile(n
 const skill = await readFile(skillFile,'utf8');
 const assets = {};
 for (const [file,type] of [['index.html','text/html; charset=utf-8'],['app.mjs','text/javascript; charset=utf-8'],['style.css','text/css; charset=utf-8']]) assets['/'+file] = {body:await readFile(new URL('public/'+file,root),'utf8'),type};
+for (const [file,type] of [['index.html','text/html; charset=utf-8'],['app.mjs','text/javascript; charset=utf-8'],['coach.mjs','text/javascript; charset=utf-8'],['meeting-link.mjs','text/javascript; charset=utf-8'],['styles.css','text/css; charset=utf-8'],['favicon.svg','image/svg+xml']]) assets['/prototype/'+file] = {body:await readFile(new URL('../prototype/'+file,root),'utf8'),type};
 const handle = createHandler(assets,catalog,skill);
 const port = Number(process.env.WORKFLOW_PORT || 4174);
 createServer(async (req,res)=>{

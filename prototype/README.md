@@ -1,6 +1,6 @@
 # Meeting Coach prototype
 
-A browser-only practice space for **one selected meeting participant**. It runs independently of Zoom and the production HTML email skill. The existing evaluator and email contract are unchanged.
+A browser-only practice space for **one selected meeting participant**. It runs independently of Zoom and the production HTML email skill. The workflow tester also serves this same prototype at `/prototype/`; its email links load the meeting summary automatically and open **Chat with AI** after you choose yourself. The existing evaluator and email contract are unchanged.
 
 From the repository root:
 
@@ -12,7 +12,7 @@ Open http://127.0.0.1:4173. No installation, account, API key, or build is requi
 
 ## Try the complete flow
 
-1. Choose one of the ten simulated meeting summaries in `summaries/`, or switch to **Generate with AI**, optionally describe a meeting, and the OpenAI API writes a new fictional summary in the same format (the shipped files are used only as a format reference). You can edit the summary before continuing.
+1. Open a recap email link to load its meeting, or choose one of the ten simulated meeting summaries in `summaries/`, or switch to **Generate with AI**, optionally describe a meeting, and the OpenAI API writes a new fictional summary in the same format (the shipped files are used only as a format reference). You can edit the summary before continuing.
 2. Choose **Which person are you?**, then open the coaching space. Participants (Participant A, B, C…) come from the summary's segments, one action per participant clause.
 3. Review the excerpt-based overview. Other participants provide context; they never receive coaching or their own plans.
 4. Use **I’m stuck** to choose a difficulty, optionally attach a moment from the summary, adapt suggested wording, and keep it in your plan.

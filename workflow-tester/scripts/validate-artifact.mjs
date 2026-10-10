@@ -22,4 +22,23 @@ assert.equal(
   `${pathToFileURL(workerPath)} must export default.fetch`,
 );
 
-console.log("Artifact is valid ESM and exports default.fetch");
+// Verify that the standalone hosted bundle contains the complete link destination.
+const handle = workerModule.default.fetch;
+for (const path of ['/prototype/','/prototype/app.mjs','/prototype/coach.mjs','/prototype/meeting-link.mjs','/prototype/styles.css','/prototype/api/status','/prototype/api/summaries']) {
+  const response = await handle(new Request(`https://meetings.example${path}`));
+  assert.equal(response.status,200,`Missing hosted asset: ${path}`);
+}
+const page = await handle(new Request('https://meetings.example/prototype/'));
+assert.ok((await page.text()).includes('Which person are you?'));
+const catalogResponse = await handle(new Request('https://meetings.example/api/catalog'));
+const catalog = await catalogResponse.json();
+const recap = await handle(new Request('https://meetings.example/api/run',{
+  method:'POST',headers:{'content-type':'application/json'},
+  body:JSON.stringify({mode:'template',maxActions:1,instructions:'Apply the skill.',skill:{id:'builtin'},sourceId:catalog.summaries[0].id}),
+}));
+assert.equal(recap.status,200);
+const result = await recap.json();
+assert.ok(result.meetingLink.startsWith('https://meetings.example/prototype/#meeting='));
+assert.ok(result.response.includes(result.meetingLink));
+
+console.log("Artifact is valid ESM; hosted meeting assets and email links work");

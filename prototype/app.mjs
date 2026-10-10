@@ -7,6 +7,11 @@ import {
   practiceOptions,
 } from "./coach.mjs";
 
+import {readMeetingLink} from "./meeting-link.mjs";
+
+const api = path => new URL(`./api/${path}`, import.meta.url);
+let linkedMeeting = false;
+
 const $ = (selector) => document.querySelector(selector);
 const content = $("#coach-content");
 const state = {
@@ -75,7 +80,7 @@ function setMode(mode) {
 async function loadLibrary() {
   const select = $("#summary-select");
   try {
-    const response = await fetch("/api/summaries");
+    const response = await fetch(api("summaries"));
     if (!response.ok) throw new Error();
     summaries = await response.json();
     select.replaceChildren(new Option("Choose a meeting", ""));
@@ -87,12 +92,12 @@ async function loadLibrary() {
   }
 }
 function toTranscript() {
-  return summaryToTranscript($("#summary").value);
+  return summaryToTranscript($("#summary").value) || $("#summary").value;
 }
 function showSummary(summary) {
   $("#session-form").hidden = false;
   $("#summary").value = summary;
-  syncParticipants(participants(parseTranscript(toTranscript()))[0]);
+  syncParticipants(linkedMeeting ? "" : participants(parseTranscript(toTranscript()))[0]);
   $("#session-error").textContent = "";
 }
 function navigate(view, focus = true) {
@@ -158,7 +163,7 @@ function renderChat() {
 }
 async function checkChat() {
   try {
-    state.chatAvailable = (await (await fetch("/api/status")).json()).chat;
+    state.chatAvailable = (await (await fetch(api("status"))).json()).chat;
   } catch {
     state.chatAvailable = false;
   }
@@ -173,7 +178,7 @@ async function sendChat(text) {
   renderChat();
   $("#chat-input").focus({ preventScroll: true });
   try {
-    const response = await fetch("/api/chat", {
+    const response = await fetch(api("chat"), {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
@@ -298,8 +303,8 @@ $("#summary").addEventListener("input", () => {
   $("#session-error").textContent = "";
 });
 $("#person").addEventListener("change", updateSourceStatus);
-$("#library-mode").addEventListener("click", () => setMode("library"));
-$("#generate-mode").addEventListener("click", () => setMode("generate"));
+$("#library-mode").addEventListener("click", () => { linkedMeeting = false; setMode("library"); });
+$("#generate-mode").addEventListener("click", () => { linkedMeeting = false; setMode("generate"); });
 $("#summary-select").addEventListener("change", (event) => {
   const meeting = summaries.find((item) => item.id === event.target.value);
   if (!meeting) return;
@@ -313,7 +318,7 @@ $("#generator").addEventListener("submit", async (event) => {
   $("#generator-error").textContent = "";
   announce("Generating a meeting summary…");
   try {
-    const response = await fetch("/api/generate-summary", {
+    const response = await fetch(api("generate-summary"), {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ description: $("#meeting-description").value }),
@@ -349,7 +354,7 @@ $("#session-form").addEventListener("submit", (event) => {
     }
     $("#session-error").textContent = "";
     updateSourceStatus();
-    navigate("summary");
+    navigate(linkedMeeting ? "chat" : "summary");
     announce(`Coaching space opened for ${session.person} only.`);
   } catch (error) {
     $("#session-error").textContent = error.message;
@@ -443,5 +448,23 @@ render();
     );
 });
 
-loadLibrary();
-render();
+async function initialize() {
+  await loadLibrary();
+  if (new URLSearchParams(location.hash.slice(1)).has("meeting")) {
+    try {
+      const meeting = await readMeetingLink(location.hash);
+      linkedMeeting = true;
+      showSummary(meeting.summary);
+      $("#setup-heading").textContent = meeting.title;
+      $("#library").hidden = true;
+      $("#generator").hidden = true;
+      $("#source-status").textContent = "Meeting loaded from your recap email. Choose which person you are to chat with AI.";
+      announce(`${meeting.title} loaded from your recap email. Choose which person you are.`);
+      $("#person").focus();
+    } catch (error) {
+      $("#library-error").textContent = error.message;
+    }
+  }
+  render();
+}
+initialize();
